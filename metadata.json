@@ -1,0 +1,8 @@
+{
+  "name": "Unexpected Bites",
+  "description": "Unexpected Bites — Gourmet Chicken Burgers, Beef Burgers, Fries, Cold Drinks & Artisanal Desserts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

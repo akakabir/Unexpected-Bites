@@ -1,0 +1,141 @@
+
+@import "tailwindcss";
+
+@theme {
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-surface: var(--theme-surface);
+  --color-theme-surface-elevated: var(--theme-surface-elevated);
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-muted: var(--theme-text-muted);
+  --color-theme-text-subtle: var(--theme-text-subtle);
+  
+  --color-amber-300: var(--theme-accent-300);
+  --color-amber-400: var(--theme-accent-400);
+  --color-amber-500: var(--theme-accent-500);
+  --color-amber-600: var(--theme-accent-600);
+}
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-serif: 'Lilita One', 'Fredoka', 'Permanent Marker', cursive, sans-serif;
+    
+    /* Dark Brown & Warm Cream Palette (Default/Dark) */
+    --theme-bg: #1E1510;
+    --theme-surface: #2A1D16;
+    --theme-surface-elevated: #38281E;
+    --theme-text: #F7F1E5;
+    --theme-text-muted: #DDD0C0;
+    --theme-text-subtle: #B29F8D;
+    --theme-accent-300: #D4B896;
+    --theme-accent-400: #B58A5B;
+    --theme-accent-500: #8C5A2B;
+    --theme-accent-600: #633E1A;
+  }
+
+  [data-theme='light'] {
+    /* Warm Cream & Rich Brown Palette (Light) */
+    --theme-bg: #F7F2E8;
+    --theme-surface: #FFFFFF;
+    --theme-surface-elevated: #EDE3D2;
+    --theme-text: #281B12;
+    --theme-text-muted: #523B2A;
+    --theme-text-subtle: #7F6652;
+    --theme-accent-300: #CFA376;
+    --theme-accent-400: #A87747;
+    --theme-accent-500: #8B5A2B;
+    --theme-accent-600: #5D3918;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-float {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: color-mix(in srgb, var(--theme-surface) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent-500) 22%, transparent);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.glass-pill {
+  background: color-mix(in srgb, var(--theme-surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--theme-accent-500) 25%, transparent);
+  -webkit-font-smoothing: antialiased;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--theme-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--theme-surface-elevated);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-accent-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+section[id] { scroll-margin-top: 120px; }
