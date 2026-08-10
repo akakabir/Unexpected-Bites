@@ -19,9 +19,11 @@ export default function Footer({ brandConfig }: FooterProps) {
         {/* Brand Column */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-stone-950 font-black text-base">
-              <Flame className="w-5 h-5 fill-stone-950" />
-            </div>
+            <img
+              src="/images/unexpected-bites-logo.png"
+              alt="Unexpected Bites"
+              className="w-8 h-8 rounded-full object-cover"
+            />
             <span className="font-serif font-bold text-lg text-[var(--theme-text)]">{brandConfig.name}</span>
           </div>
           <p className="text-[var(--theme-text-muted)] leading-relaxed text-xs">
