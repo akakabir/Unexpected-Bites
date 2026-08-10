@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Analytics } from '@vercel/analytics/react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import MarqueeTrustBar from './components/MarqueeTrustBar';
@@ -398,6 +399,7 @@ export default function App() {
         )}
         <Mascot />
       </Suspense>
+      <Analytics />
     </div>
   );
 }
