@@ -163,6 +163,10 @@ export default function KitchenVideoBackground({
     setIsPlaying(false);
 
     let scrollTriggerInstance: ScrollTrigger | null = null;
+    let rafId: number | null = null;
+    let lastTimestamp = performance.now();
+    let currentVideoTime = 0.001;
+    let targetVideoTime = 0.001;
 
     const setupScrollScrub = () => {
       if (!heroRef.current || !videoRef.current) return;
@@ -173,33 +177,57 @@ export default function KitchenVideoBackground({
         scrollTriggerInstance.kill();
       }
 
-      // Pin the hero section while scrubbing video frame-by-frame
+      // Smoothly scrub video currentTime across Hero section scroll duration without pinning (prevents layout overlaps and giant blank gaps)
       scrollTriggerInstance = ScrollTrigger.create({
         trigger: heroRef.current,
-        pin: true,
-        pinSpacing: true,
         start: 'top top',
-        end: '+=1400', // 1400px scroll scrub distance
-        scrub: 0.1,
-        anticipatePin: 1,
+        end: 'bottom top',
+        scrub: 0.2,
         onUpdate: (self) => {
           if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
-            // Map scroll progress (0.0 to 1.0) directly to currentTime
-            const targetTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
-            v.currentTime = targetTime;
+            targetVideoTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
           }
         },
         onLeave: () => {
           if (v && v.duration) {
-            v.currentTime = Math.max(0.001, v.duration - 0.05);
+            targetVideoTime = Math.max(0.001, v.duration - 0.05);
           }
         },
         onLeaveBack: () => {
-          if (v) {
-            v.currentTime = 0.001;
-          }
+          targetVideoTime = 0.001;
         }
       });
+
+      // RAF loop to cap playback rate at 1x maximum
+      lastTimestamp = performance.now();
+
+      const updateVideoFrame = () => {
+        const now = performance.now();
+        const dt = Math.min((now - lastTimestamp) / 1000, 0.1); // delta time in seconds, clamped
+        lastTimestamp = now;
+
+        if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
+          if (Math.abs(currentVideoTime - targetVideoTime) > 0.005) {
+            const maxStep = dt * 1.0; // Capped to 1x video playback speed
+            if (currentVideoTime < targetVideoTime) {
+              const step = Math.min(targetVideoTime - currentVideoTime, maxStep);
+              currentVideoTime += step;
+            } else {
+              const step = Math.min(currentVideoTime - targetVideoTime, maxStep);
+              currentVideoTime -= step;
+            }
+            try {
+              v.currentTime = currentVideoTime;
+            } catch {
+              // Ignore seek errors
+            }
+          }
+        }
+
+        rafId = requestAnimationFrame(updateVideoFrame);
+      };
+
+      rafId = requestAnimationFrame(updateVideoFrame);
 
       ScrollTrigger.refresh();
     };
@@ -212,6 +240,9 @@ export default function KitchenVideoBackground({
     }
 
     return () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
       if (scrollTriggerInstance) {
         scrollTriggerInstance.kill();
       }
@@ -303,10 +334,10 @@ export default function KitchenVideoBackground({
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%)`,
+          background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%)`,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/30 to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/20 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[var(--theme-bg)] to-transparent" />
     </div>
   );

@@ -71,7 +71,7 @@ export default function DrawingSvgDivider({
   const config = dividerConfigs[(effectiveIndex - 1) % 5];
 
   return (
-    <div className={`w-full max-w-7xl mx-auto overflow-hidden pointer-events-none my-20 sm:my-28 px-4 ${className}`}>
+    <div className={`w-full max-w-7xl mx-auto overflow-hidden pointer-events-none my-12 sm:my-16 px-4 ${className}`}>
       <svg
         viewBox="0 0 1920 100"
         fill="none"

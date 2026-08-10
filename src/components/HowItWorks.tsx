@@ -113,18 +113,15 @@ export default function HowItWorks() {
       );
     });
 
-    // PINNED SECTION (Requirement 5) - Pinned on Desktop for step-by-step progress
-    if (!isMobile && !isReduced && pinContainerRef.current) {
-      const pinTrigger = ScrollTrigger.create({
+    // Step card highlight animation as user scrolls through the section naturally
+    if (sectionRef.current) {
+      const highlightTrigger = ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: 'top top+=80',
-        end: '+=1100',
-        pin: pinContainerRef.current,
-        pinSpacing: true,
+        start: 'top 70%',
+        end: 'bottom 30%',
         scrub: 1,
         onUpdate: (self) => {
           const progress = self.progress;
-          // Dynamically scale & highlight step cards as user scrolls through the pinned viewport
           stepRefs.current.forEach((stepEl, i) => {
             if (!stepEl) return;
             const targetProg = i / (steps.length - 1);
@@ -149,7 +146,7 @@ export default function HowItWorks() {
       });
 
       return () => {
-        pinTrigger.kill();
+        highlightTrigger.kill();
         ScrollTrigger.getAll().forEach((st) => {
           if (st.trigger === sectionRef.current) st.kill();
         });

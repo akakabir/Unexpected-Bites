@@ -294,7 +294,7 @@ export default function App() {
               <MarqueeTrustBar />
 
               {/* 1. Divider One: Wave */}
-              <DrawingSvgDivider index={1} variant="wave" className="my-24 sm:my-32" />
+              <DrawingSvgDivider index={1} variant="wave" className="my-10 sm:my-14" />
 
               <MenuSection
                 dishes={dishes}
@@ -306,22 +306,22 @@ export default function App() {
               />
 
               {/* 2. Divider Two: Flow */}
-              <DrawingSvgDivider index={2} variant="flow" className="my-24 sm:my-32" />
+              <DrawingSvgDivider index={2} variant="flow" className="my-10 sm:my-14" />
 
               <HowItWorks />
 
               {/* 3. Divider Three: Curved */}
-              <DrawingSvgDivider index={3} variant="curved" className="my-24 sm:my-32" />
+              <DrawingSvgDivider index={3} variant="curved" className="my-10 sm:my-14" />
 
               <WhyChooseUs />
 
               {/* 4. Divider Four: Zigzag */}
-              <DrawingSvgDivider index={4} variant="zigzag" className="my-24 sm:my-32" />
+              <DrawingSvgDivider index={4} variant="zigzag" className="my-10 sm:my-14" />
 
               <FoodGallery />
 
               {/* 5. Divider Five: Loop */}
-              <DrawingSvgDivider index={5} variant="loop" className="my-24 sm:my-32" />
+              <DrawingSvgDivider index={5} variant="loop" className="my-10 sm:my-14" />
 
               <Testimonials
                 userReviews={userReviews}
