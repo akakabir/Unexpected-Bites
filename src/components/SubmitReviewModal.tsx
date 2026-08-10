@@ -31,7 +31,7 @@ export default function SubmitReviewModal({
       location: location || 'Central City Patron',
       rating,
       comment,
-      dishOrdered: dishOrdered || 'Signature Wok Bowl',
+      dishOrdered: dishOrdered || 'Crispy Chicken & Fries',
       submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     };
 

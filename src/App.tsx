@@ -111,14 +111,58 @@ export default function App() {
   const [userReviews, setUserReviews] = useState<UserSubmittedReview[]>(() => {
     try {
       const saved = localStorage.getItem('wok_user_reviews');
-      if (saved && JSON.parse(saved).length > 0) {
-        return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.length > 0 && !parsed[0].comment?.includes('biryani') && !parsed[0].comment?.includes('noodles')) {
+          return parsed;
+        }
       }
       return [
-        { id: "rev-1", name: "Priya S.", rating: 5, comment: "Absolutely incredible! The biryani arrived steaming hot, and the flame-seared burger had that perfect smoky flavor.", date: new Date().toISOString() },
-        { id: "rev-2", name: "Rahul M.", rating: 4, comment: "Fastest delivery I've experienced. Packaging kept the fries super crispy.", date: new Date().toISOString() },
-        { id: "rev-3", name: "Anita K.", rating: 5, comment: "The wok-tossed noodles were authentic and packed with flavor. Loved the eco-friendly boxes!", date: new Date().toISOString() },
-        { id: "rev-4", name: "Vikram R.", rating: 5, comment: "Gourmet quality right to my doorstep. The thermal sealing really works.", date: new Date().toISOString() }
+        {
+          id: "rev-1",
+          name: "Rohan Sharma",
+          location: "Connaught Place",
+          rating: 5,
+          dishOrdered: "Classic Double Smash Beef Burger",
+          comment: "The double smash patty had incredible crispy lacy edges and melted cheddar. Delivered piping hot in sealed thermal packaging. Hands down the best burger in town!",
+          submittedAt: "2 hours ago"
+        },
+        {
+          id: "rev-2",
+          name: "Aanya Kapoor",
+          location: "Khan Market",
+          rating: 5,
+          dishOrdered: "Unexpected Crispy Chicken Burger",
+          comment: "That buttermilk fried chicken crunch is unreal! The secret bite sauce is divine, and the fries were still golden and super crispy upon delivery.",
+          submittedAt: "Yesterday"
+        },
+        {
+          id: "rev-3",
+          name: "Karan Verma",
+          location: "Defence Colony",
+          rating: 5,
+          dishOrdered: "Warm Cream Cheese Cinnamon Roll",
+          comment: "The cinnamon roll was warm, pillow-soft, and smothered in rich cream cheese glaze. Paired with their cold brew coffee—pure bliss!",
+          submittedAt: "1 day ago"
+        },
+        {
+          id: "rev-4",
+          name: "Meera Nair",
+          location: "Greater Kailash",
+          rating: 5,
+          dishOrdered: "Truffle Parmesan Dust Fries",
+          comment: "The thermal sealing really works! The truffle fries stayed hot and crispy, and the bacon cheddar beef burger was juicy perfection.",
+          submittedAt: "2 days ago"
+        },
+        {
+          id: "rev-5",
+          name: "Aman Preet",
+          location: "Vasant Kunj",
+          rating: 5,
+          dishOrdered: "Cheesy Lava Monster Beef Burger",
+          comment: "Express 20-min delivery and the cheesy lava beef burger was huge and packed with flavor. Loved the eco-friendly thermal sealed box!",
+          submittedAt: "3 days ago"
+        }
       ];
     } catch {
       return [];

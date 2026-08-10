@@ -1,9 +1,7 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { ShoppingBag, Phone, Menu, X, Sparkles, Clock, Flame, Palette } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingBag, Phone, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BrandConfig, CartItem, PageTab } from '../types';
-
-const ThemeSwitcherModal = lazy(() => import('./ThemeSwitcherModal'));
 
 interface NavbarProps {
   brandConfig: BrandConfig;
@@ -22,7 +20,6 @@ export default function Navbar({
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [themeModalOpen, setThemeModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -111,16 +108,6 @@ export default function Navbar({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2.5">
-            {/* Theme Settings Icon - Sticker Style */}
-            <button
-              onClick={() => setThemeModalOpen(true)}
-              className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[var(--theme-surface)] text-[var(--theme-text)] hover:bg-amber-400 hover:text-stone-950 transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer shrink-0"
-              aria-label="Change Theme"
-              title="Change Color Theme"
-            >
-              <Palette className="w-4.5 h-4.5 stroke-[2.5]" />
-            </button>
-
             {/* WhatsApp Direct Order - Sticker Style */}
             <button
               onClick={handleWhatsAppClick}
@@ -131,17 +118,17 @@ export default function Navbar({
               <span className="hidden sm:inline-block">WhatsApp</span>
             </button>
 
-            {/* Cart Button - Sticker Style */}
+            {/* Cart Button - Sticker Style (Orange) */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onOpenCart}
-              className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-400 hover:to-amber-300 text-stone-950 font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
+              className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
               aria-label="Open Cart"
             >
               <ShoppingBag className="w-4.5 h-4.5 stroke-[2.5]" />
               {totalCartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
+                <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
                   {totalCartCount}
                 </span>
               )}
@@ -197,16 +184,6 @@ export default function Navbar({
           )}
         </AnimatePresence>
       </header>
-
-      {/* Theme Switcher Modal */}
-      <Suspense fallback={null}>
-        {themeModalOpen && (
-          <ThemeSwitcherModal 
-            isOpen={themeModalOpen} 
-            onClose={() => setThemeModalOpen(false)} 
-          />
-        )}
-      </Suspense>
     </>
   );
 }
