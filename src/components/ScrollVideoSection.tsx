@@ -22,6 +22,7 @@ export default function ScrollVideoSection({ onNavigateToMenu }: ScrollVideoSect
           setIsInView(entry.isIntersecting);
           if (videoRef.current) {
             if (entry.isIntersecting) {
+              videoRef.current.playbackRate = 1;
               videoRef.current.play().catch(() => {});
             } else {
               videoRef.current.pause();

@@ -22,6 +22,7 @@ export default function VideoShowcase({ onNavigateToMenu }: VideoShowcaseProps) 
       if (isPlaying) {
         mainVideoRef.current.pause();
       } else {
+        mainVideoRef.current.playbackRate = 1;
         mainVideoRef.current.play();
       }
       setIsPlaying(!isPlaying);
@@ -40,6 +41,7 @@ export default function VideoShowcase({ onNavigateToMenu }: VideoShowcaseProps) 
     setIsPlaying(true);
     if (mainVideoRef.current) {
       mainVideoRef.current.currentTime = 0;
+      mainVideoRef.current.playbackRate = 1;
       mainVideoRef.current.play();
     }
   };

@@ -301,6 +301,8 @@ export default function App() {
                 onSelectDish={(dish) => setSelectedDishModal(dish)}
                 onAddToCart={(dish) => handleAddToCart(dish, 1)}
                 selectedCategory={selectedCategory}
+                highlightsOnly={true}
+                onNavigateToMenu={() => handleSelectPage('menu')}
               />
 
               {/* 2. Divider Two: Flow */}

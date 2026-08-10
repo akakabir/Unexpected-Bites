@@ -37,7 +37,7 @@ export default function FAQSection() {
               key={faq.id}
               layout
               className={`glass-panel rounded-2xl border transition-colors ${
-                isOpen ? 'border-amber-500/60 bg-[var(--theme-surface-elevated)]/90 shadow-xl' : 'border-stone-800/80 hover:border-stone-700 bg-[var(--theme-surface-elevated)]/60'
+                isOpen ? 'border-amber-500/60 bg-[var(--theme-surface-elevated)] shadow-xl' : 'border-amber-500/20 hover:border-amber-500/40 bg-[var(--theme-surface)]'
               }`}
             >
               <button
@@ -64,7 +64,7 @@ export default function FAQSection() {
                     transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[var(--theme-text-muted)] leading-relaxed border-t border-stone-800/60 pl-11">
+                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-[var(--theme-text-muted)] leading-relaxed border-t border-amber-500/20 pl-11">
                       {faq.answer}
                     </div>
                   </motion.div>

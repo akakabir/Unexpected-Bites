@@ -39,20 +39,20 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
           transition={{ duration: 0.7, type: "spring", damping: 20 }}
           className="lg:col-span-6 flex flex-col gap-6"
         >
-          <div className="inline-flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full w-fit">
+          <div className="inline-flex items-center gap-2 text-amber-600 text-xs font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full w-fit">
             <Sparkles className="w-4 h-4" />
             <span>OUR CULINARY WOK PHILOSOPHY</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--theme-text)] leading-tight">
             Redefining Gourmet <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500">
+            <span className="text-amber-600 font-extrabold">
               Asian Cloud Dining
             </span>
           </h2>
 
           <p className="text-[var(--theme-text-muted)] text-base leading-relaxed">
-            Founded with a commitment to authentic wok hei, <span className="text-amber-400 font-bold">{brandConfig.name}</span> bridges the gap between high-end restaurant wok techniques and hyper-fast delivery. We believe food delivered to your home should never sacrifice heat, texture, or nutritional integrity.
+            Founded with a commitment to authentic wok hei, <span className="text-amber-700 font-bold">{brandConfig.name}</span> bridges the gap between high-end restaurant wok techniques and hyper-fast delivery. We believe food delivered to your home should never sacrifice heat, texture, or nutritional integrity.
           </p>
 
           <p className="text-[var(--theme-text-subtle)] text-sm leading-relaxed">
@@ -72,7 +72,7 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
                 whileHover={{ x: 4 }}
                 className="flex items-center gap-2.5 text-[var(--theme-text)] text-xs font-semibold"
               >
-                <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
                 <span>{item}</span>
               </motion.div>
             ))}
@@ -81,9 +81,9 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
           {/* Master Culinary Collective Box */}
           <motion.div
             whileHover={{ y: -4, scale: 1.01 }}
-            className="p-4.5 rounded-2xl glass-panel border border-amber-500/30 flex items-center gap-4 mt-2 bg-[var(--theme-surface-elevated)]/80 shadow-xl relative overflow-hidden"
+            className="p-4.5 rounded-2xl glass-panel border border-amber-500/30 flex items-center gap-4 mt-2 bg-[var(--theme-surface-elevated)] shadow-xl relative overflow-hidden"
           >
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-400/80 shrink-0 shadow-lg">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-500 shrink-0 shadow-lg">
               <img loading="lazy"
                 src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=75&fm=webp"
                 alt="Culinary Team"
@@ -93,9 +93,9 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
             <div className="flex flex-col">
               <span className="text-xs font-bold text-[var(--theme-text)] font-serif flex items-center gap-1.5">
                 <span>Master Wok Culinary Collective</span>
-                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <Award className="w-3.5 h-3.5 text-amber-600" />
               </span>
-              <span className="text-[11px] text-amber-400 font-semibold">Artisanal Flame Technique</span>
+              <span className="text-[11px] text-amber-700 font-bold">Artisanal Flame Technique</span>
               <p className="text-[11px] text-[var(--theme-text-muted)] italic mt-0.5">
                 "Every wok dish is tossed to order with high-flame wok hei — intense sizzle, vibrant garden crunch, and thermal retention excellence."
               </p>
@@ -118,21 +118,21 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
                 key={index}
                 whileHover={{ y: -6, scale: 1.02 }}
                 transition={{ type: "spring", damping: 15, stiffness: 200 }}
-                className="glass-panel p-6 rounded-3xl border border-stone-800 hover:border-amber-500/50 transition-all duration-300 group relative overflow-hidden bg-[var(--theme-surface-elevated)]/80 shadow-xl"
+                className="glass-panel p-6 rounded-3xl border border-amber-500/30 hover:border-amber-500/60 transition-all duration-300 group relative overflow-hidden bg-[var(--theme-surface)] shadow-xl"
               >
                 <div className="absolute -right-10 -bottom-10 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
 
                 <div className="flex items-start justify-between gap-4 relative z-10">
                   <div className="flex items-center gap-3">
-                    <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-400 group-hover:scale-110 transition-transform shadow-md">
+                    <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-700 group-hover:scale-110 transition-transform shadow-md">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <h3 className="font-serif font-bold text-lg text-[var(--theme-text)] group-hover:text-amber-400 transition-colors">
+                    <h3 className="font-serif font-bold text-lg text-[var(--theme-text)] group-hover:text-amber-700 transition-colors">
                       {item.title}
                     </h3>
                   </div>
 
-                  <span className="bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-extrabold px-3.5 py-1 rounded-full whitespace-nowrap shadow-sm">
+                  <span className="bg-amber-500/20 text-amber-900 border border-amber-500/40 text-xs font-extrabold px-3.5 py-1 rounded-full whitespace-nowrap shadow-sm">
                     {item.stat}
                   </span>
                 </div>

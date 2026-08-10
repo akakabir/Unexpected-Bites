@@ -170,21 +170,21 @@ export default function Hero({
             variants={wordContainerVariants}
             initial="hidden"
             animate="visible"
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[var(--theme-text)] leading-[1.08] tracking-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-extrabold text-amber-500 leading-[1.08] tracking-tight drop-shadow-sm"
           >
-            <motion.span variants={wordChildVariants} className="inline-block">
+            <motion.span variants={wordChildVariants} className="inline-block text-amber-500">
               {siteContent?.heroHeadline1 || "Gourmet Burgers &"}
             </motion.span>{" "}
             <br />
             <motion.span
               variants={wordChildVariants}
-              className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-600 drop-shadow-[0_0_25px_rgba(181,138,91,0.3)]"
+              className="inline-block text-amber-500 font-extrabold"
             >
               {siteContent?.heroHeadline2 || "Warm Artisanal Desserts"}
             </motion.span>{" "}
             <br />
-            <motion.span variants={wordChildVariants} className="inline-block">
-              {siteContent?.heroHeadline3 || <>Delivered In <AnimatedCounter to={20} suffix=" Mins." className="text-amber-400 font-extrabold" /></>}
+            <motion.span variants={wordChildVariants} className="inline-block text-amber-500">
+              {siteContent?.heroHeadline3 || <>Delivered In <AnimatedCounter to={20} suffix=" Mins." className="text-amber-600 font-black" /></>}
             </motion.span>
           </motion.h1>
 
@@ -193,7 +193,7 @@ export default function Hero({
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-[var(--theme-text-muted)] text-base md:text-lg max-w-2xl leading-relaxed font-normal"
+            className="text-white drop-shadow-md text-base md:text-lg max-w-2xl leading-relaxed font-medium"
           >
             {siteContent?.heroSubtitle || "Experience hand-crafted chicken and beef burgers, golden crispy fries, cold drinks, and warm cinnamon rolls and desserts prepared fresh and delivered in thermal sealed packaging."}
           </motion.p>          {/* Trust Metrics Bar */}

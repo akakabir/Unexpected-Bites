@@ -17,24 +17,36 @@
 
 @layer base {
   :root {
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-serif: 'Lilita One', 'Fredoka', 'Permanent Marker', cursive, sans-serif;
+    --font-sans: 'Merriweather', Georgia, serif;
+    --font-serif: 'Merriweather', Georgia, serif;
     
-    /* Dark Brown & Warm Cream Palette (Default/Dark) */
-    --theme-bg: #1E1510;
-    --theme-surface: #2A1D16;
-    --theme-surface-elevated: #38281E;
-    --theme-text: #F7F1E5;
-    --theme-text-muted: #DDD0C0;
-    --theme-text-subtle: #B29F8D;
-    --theme-accent-300: #D4B896;
-    --theme-accent-400: #B58A5B;
-    --theme-accent-500: #8C5A2B;
-    --theme-accent-600: #633E1A;
+    /* Beige & Warm Brown Palette (Default) */
+    --theme-bg: #F7F2E8;
+    --theme-surface: #FFFFFF;
+    --theme-surface-elevated: #EDE3D2;
+    --theme-text: #281B12;
+    --theme-text-muted: #523B2A;
+    --theme-text-subtle: #7F6652;
+    --theme-accent-300: #CFA376;
+    --theme-accent-400: #A87747;
+    --theme-accent-500: #8B5A2B;
+    --theme-accent-600: #5D3918;
   }
 
   [data-theme='light'] {
-    /* Warm Cream & Rich Brown Palette (Light) */
+    --theme-bg: #F7F2E8;
+    --theme-surface: #FFFFFF;
+    --theme-surface-elevated: #EDE3D2;
+    --theme-text: #281B12;
+    --theme-text-muted: #523B2A;
+    --theme-text-subtle: #7F6652;
+    --theme-accent-300: #CFA376;
+    --theme-accent-400: #A87747;
+    --theme-accent-500: #8B5A2B;
+    --theme-accent-600: #5D3918;
+  }
+
+  [data-theme='dark'] {
     --theme-bg: #F7F2E8;
     --theme-surface: #FFFFFF;
     --theme-surface-elevated: #EDE3D2;
@@ -54,7 +66,7 @@
     overflow-x: hidden;
   }
 
-  h1, h2, h3, .font-serif {
+  h1, h2, h3, h4, h5, h6, .font-serif, .font-sans {
     font-family: var(--font-serif);
   }
 }

@@ -146,6 +146,7 @@ export default function KitchenVideoBackground({
     if (isMobileDevice || isReducedMotion || !heroRef || !heroRef.current) {
       video.muted = isMuted;
       video.loop = true;
+      video.playbackRate = 1;
       video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       return;
     }
@@ -153,6 +154,7 @@ export default function KitchenVideoBackground({
     // Desktop Scroll-Scrub Mode:
     // 1. Video stays strictly paused (on frame 0 / 0.001) when page first loads
     video.pause();
+    video.playbackRate = 1;
     try {
       video.currentTime = 0.001;
     } catch {
@@ -228,6 +230,7 @@ export default function KitchenVideoBackground({
       video.pause();
       setIsPlaying(false);
     } else {
+      video.playbackRate = 1;
       video.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   };
@@ -305,114 +308,6 @@ export default function KitchenVideoBackground({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/30 to-black/50" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[var(--theme-bg)] to-transparent" />
-
-      {/* Interactive Control Trigger for Video Switch / Custom Upload (Interactive pointer events enabled) */}
-      <div className="absolute bottom-6 left-6 z-20 pointer-events-auto flex items-center gap-2">
-        <button
-          onClick={() => setShowControls(!showControls)}
-          className="px-3.5 py-2 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-amber-500/40 text-amber-300 font-serif font-bold text-xs flex items-center gap-2 shadow-lg backdrop-blur-md transition-all cursor-pointer hover:scale-105"
-          title="Video Background Settings"
-        >
-          <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-          <span>Live Kitchen Loop</span>
-          <Sparkles className="w-3 h-3 text-amber-400" />
-        </button>
-
-        <button
-          onClick={toggleMute}
-          className="p-2 rounded-full bg-stone-950/80 hover:bg-stone-900 border border-stone-800 text-stone-300 hover:text-amber-400 shadow-lg backdrop-blur-md transition-all cursor-pointer"
-          title={isMuted ? "Unmute Sizzle Sound" : "Mute Sound"}
-        >
-          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
-        </button>
-      </div>
-
-      {/* Video Control Drawer / Modal */}
-      <AnimatePresence>
-        {showControls && (
-          <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute bottom-20 left-6 z-30 pointer-events-auto w-80 p-4 rounded-2xl bg-stone-950/95 border-2 border-stone-800 text-stone-100 shadow-2xl backdrop-blur-xl"
-          >
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-stone-800">
-              <h4 className="font-serif font-bold text-xs text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Flame className="w-4 h-4" />
-                <span>Background Video Source</span>
-              </h4>
-              <button
-                onClick={() => setShowControls(false)}
-                className="text-stone-400 hover:text-white text-xs font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-stone-400 mb-3">
-              Watching live wok fried rice stir-fry (peas, carrots, soy sauce drizzle, and scallions).
-            </p>
-
-            <div className="flex items-center gap-2 mb-3">
-              <button
-                onClick={togglePlay}
-                className="flex-1 py-1.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-serif font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-              >
-                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span>{isPlaying ? 'Pause Loop' : 'Play Loop'}</span>
-              </button>
-
-              <button
-                onClick={() => setCurrentVideoUrl(defaultVideoUrl)}
-                className="py-1.5 px-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center gap-1 cursor-pointer"
-                title="Reset to default video"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Reset</span>
-              </button>
-            </div>
-
-            {/* Custom File Upload */}
-            <div className="space-y-2 pt-2 border-t border-stone-800/80">
-              <label className="block text-[11px] font-bold text-stone-300 uppercase">
-                Upload Custom MP4 Video
-              </label>
-              <label className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-stone-700 hover:border-amber-400 bg-stone-900/50 hover:bg-stone-900 text-stone-300 hover:text-amber-300 text-xs cursor-pointer transition-all">
-                <Upload className="w-3.5 h-3.5" />
-                <span>Choose MP4 File...</span>
-                <input
-                  type="file"
-                  accept="video/mp4,video/webm"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-
-            {/* Direct URL Form */}
-            <form onSubmit={handleApplyCustomUrl} className="mt-3 space-y-1.5">
-              <label className="block text-[11px] font-bold text-stone-300 uppercase">
-                Or Paste MP4 Video URL
-              </label>
-              <div className="flex gap-1.5">
-                <input
-                  type="url"
-                  placeholder="https://.../video.mp4"
-                  value={customUrlInput}
-                  onChange={(e) => setCustomUrlInput(e.target.value)}
-                  className="flex-1 bg-stone-900 border border-stone-800 rounded-lg px-2.5 py-1 text-xs text-stone-100 placeholder-stone-600 focus:outline-none focus:border-amber-400"
-                />
-                <button
-                  type="submit"
-                  className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs rounded-lg transition-all cursor-pointer"
-                >
-                  Apply
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

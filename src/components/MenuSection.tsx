@@ -10,6 +10,8 @@ interface MenuSectionProps {
   onSelectDish: (dish: Dish) => void;
   onAddToCart: (dish: Dish) => void;
   selectedCategory?: string;
+  highlightsOnly?: boolean;
+  onNavigateToMenu?: () => void;
 }
 
 export default function MenuSection({
@@ -17,6 +19,8 @@ export default function MenuSection({
   onSelectDish,
   onAddToCart,
   selectedCategory = 'all',
+  highlightsOnly = false,
+  onNavigateToMenu,
 }: MenuSectionProps) {
   const [activeCategory, setActiveCategory] = useState<string>(selectedCategory);
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,14 +32,16 @@ export default function MenuSection({
     }
   }, [selectedCategory]);
 
-  const filteredDishes = dishes.filter((dish) => {
-    const matchesCategory = activeCategory === 'all' || dish.category === activeCategory;
-    const matchesSearch =
-      dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dish.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      dish.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  const filteredDishes = highlightsOnly
+    ? dishes.filter((dish) => dish.isBestseller || dish.isChefSpecial)
+    : dishes.filter((dish) => {
+        const matchesCategory = activeCategory === 'all' || dish.category === activeCategory;
+        const matchesSearch =
+          dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          dish.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          dish.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+      });
 
   const handleQuickAdd = (e: MouseEvent, dish: Dish) => {
     e.stopPropagation();
@@ -56,61 +62,65 @@ export default function MenuSection({
         transition={{ duration: 0.6 }}
         className="flex flex-col items-center text-center gap-4 mb-12"
       >
-        <div className="inline-flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-widest bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full shadow-lg">
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>FRESH GOURMET FEAST SELECTIONS</span>
+        <div className="inline-flex items-center gap-2 text-amber-500 text-xs font-bold uppercase tracking-widest bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full shadow-lg">
+          <Sparkles className="w-4 h-4 text-amber-500" />
+          <span>{highlightsOnly ? "CHEF'S SIGNATURE HIGHLIGHTS" : "FRESH GOURMET FEAST SELECTIONS"}</span>
         </div>
 
         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold text-[var(--theme-text)]">
-          Our Sizzling Gourmet Menu
+          {highlightsOnly ? "Menu Highlights & Bestsellers" : "Our Sizzling Gourmet Menu"}
         </h2>
 
         <p className="text-[var(--theme-text-muted)] text-sm max-w-xl">
-          Crafted live on open flames. Sealed with induction thermal barriers for peak sizzle and aroma.
+          {highlightsOnly
+            ? "Hand-picked customer favorites and master chef specials prepared fresh with thermal sealed packaging."
+            : "Crafted live on open flames. Sealed with induction thermal barriers for peak sizzle and aroma."}
         </p>
       </motion.div>
 
-      {/* Search & Category Filter Controls */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-none">
-          {MENU_CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`relative px-4 py-2.5 rounded-2xl text-xs font-bold tracking-wide transition-colors whitespace-nowrap ${
-                  isActive ? 'text-stone-950 font-black' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] bg-[var(--theme-surface)] border border-amber-500/20'
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeCategoryTab"
-                    transition={{ type: 'spring', damping: 22, stiffness: 300 }}
-                    className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-2xl shadow-lg shadow-amber-500/25 z-0"
-                  />
-                )}
-                <span className="relative z-10 flex items-center gap-1.5">
-                  <span>{cat.label}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      {/* Search & Category Filter Controls (Full Menu only) */}
+      {!highlightsOnly && (
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
+          {/* Category Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-none">
+            {MENU_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`relative px-4 py-2.5 rounded-2xl text-xs font-bold tracking-wide transition-colors whitespace-nowrap ${
+                    isActive ? 'text-stone-950 font-black' : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] bg-[var(--theme-surface)] border border-amber-500/20'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCategoryTab"
+                      transition={{ type: 'spring', damping: 22, stiffness: 300 }}
+                      className="absolute inset-0 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 rounded-2xl shadow-lg shadow-amber-500/25 z-0"
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <span>{cat.label}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Search Bar */}
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
-          <input
-            type="text"
-            placeholder="Search gourmet dishes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[var(--theme-surface)] border border-amber-500/30 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[var(--theme-text)] placeholder-stone-500 focus:outline-none focus:border-amber-400 transition-colors"
-          />
+          {/* Search Bar */}
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
+            <input
+              type="text"
+              placeholder="Search gourmet dishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[var(--theme-surface)] border border-amber-500/30 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[var(--theme-text)] placeholder-stone-500 focus:outline-none focus:border-amber-500 transition-colors"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Dishes Bento Grid with 3D Tilt Cards */}
       <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-6">
@@ -262,6 +272,18 @@ export default function MenuSection({
           })}
         </AnimatePresence>
       </motion.div>
+
+      {highlightsOnly && onNavigateToMenu && (
+        <div className="flex justify-center mt-12">
+          <button
+            onClick={onNavigateToMenu}
+            className="px-8 py-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-stone-950 font-serif font-black text-sm border-2 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] hover:shadow-[6px_6px_0_0_var(--theme-text)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <span>Explore Full Menu ({dishes.length} Items)</span>
+            <ChevronRight className="w-4 h-4 stroke-[3]" />
+          </button>
+        </div>
+      )}
 
       {filteredDishes.length === 0 && (
         <div className="text-center py-16 text-[var(--theme-text-muted)]">

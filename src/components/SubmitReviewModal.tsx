@@ -73,12 +73,12 @@ export default function SubmitReviewModal({
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3 mb-6 border-b border-stone-800 pb-4">
-              <div className="p-3 bg-amber-500/20 text-amber-400 rounded-2xl border border-amber-500/30">
+            <div className="flex items-center gap-3 mb-6 border-b border-amber-500/30 pb-4">
+              <div className="p-3 bg-amber-500/20 text-amber-600 rounded-2xl border border-amber-500/30">
                 <MessageSquarePlus className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                <span className="text-xs text-amber-600 font-bold uppercase tracking-wider flex items-center gap-1">
                   <Gift className="w-3.5 h-3.5" />
                   <span>DAY 1 SOFT LAUNCH OFFER</span>
                 </span>
@@ -88,7 +88,7 @@ export default function SubmitReviewModal({
               </div>
             </div>
 
-            <p className="text-[var(--theme-text-muted)] text-xs mb-6 leading-relaxed bg-[var(--theme-surface-elevated)]/80 p-3.5 rounded-xl border border-stone-800">
+            <p className="text-[var(--theme-text-muted)] text-xs mb-6 leading-relaxed bg-[var(--theme-surface-elevated)] p-3.5 rounded-xl border border-amber-500/20">
               Submit your authentic review below. Your review will immediately appear on the main website wall of reviews!
             </p>
 
@@ -159,7 +159,7 @@ export default function SubmitReviewModal({
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tell us about the wok aroma, heat level, packaging, and delivery speed..."
                   rows={3}
-                  className="w-full bg-[var(--theme-surface-elevated)] border border-stone-700 focus:border-amber-400 rounded-xl p-3 text-sm text-[var(--theme-text)] outline-none transition-colors resize-none"
+                  className="w-full bg-[var(--theme-surface-elevated)] border border-amber-500/30 focus:border-amber-500 rounded-xl p-3 text-sm text-[var(--theme-text)] outline-none transition-colors resize-none"
                   required
                 />
               </div>
@@ -168,7 +168,7 @@ export default function SubmitReviewModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2.5 bg-[var(--theme-surface)] hover:bg-stone-700 text-[var(--theme-text-muted)] rounded-xl text-xs font-bold transition-colors"
+                  className="px-5 py-2.5 bg-[var(--theme-surface-elevated)] hover:bg-[var(--theme-bg)] text-[var(--theme-text-muted)] rounded-xl text-xs font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

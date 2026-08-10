@@ -26,17 +26,17 @@ export const MENU_CATEGORIES = [
 ];
 
 export const COLOR_TOKENS = {
-  background: "#1E1510", // Espresso Dark Brown
-  surface: "#2A1D16", // Warm Mocha Surface
-  surfaceElevated: "#38281E", // Dark Caramel Brown
-  border: "rgba(140, 90, 43, 0.28)", // Warm Amber-Brown Border
-  accentGold: "#B58A5B", // Golden Chestnut
-  accentCrimson: "#8C5A2B", // Rich Brown
-  accentEmerald: "#673F1A", // Deep Chocolate Brown
-  accentBun: "#F7F2E8", // Cream Beige
-  textPrimary: "#F7F1E5", // Cream Text
-  textSecondary: "#DDD0C0", // Warm Beige Text
-  textMuted: "#B29F8D", // Taupe Muted
+  background: "#F7F2E8", // Cream Beige
+  surface: "#FFFFFF", // White Surface
+  surfaceElevated: "#EDE3D2", // Warm Beige Surface
+  border: "rgba(139, 90, 43, 0.28)", // Warm Amber-Brown Border
+  accentGold: "#A87747", // Golden Chestnut
+  accentCrimson: "#8B5A2B", // Rich Brown
+  accentEmerald: "#5D3918", // Deep Chocolate
+  accentBun: "#CFA376", // Warm Accent
+  textPrimary: "#281B12", // Dark Espresso Text
+  textSecondary: "#523B2A", // Medium Warm Brown Text
+  textMuted: "#7F6652", // Soft Taupe Text
 };
 
 export const MARQUEE_PARTNERS = [
