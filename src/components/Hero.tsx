@@ -49,35 +49,21 @@ export default function Hero({
     return () => clearInterval(interval);
   }, [heroDishes.length]);
 
-  // Layered Parallax for Hero Copy Column
+  // Subtle parallax scale for Hero elements during pinned background video scrub
   useEffect(() => {
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (isReduced) return;
 
-    // Copy Column Parallax
-    if (copyLayerRef.current) {
-      gsap.to(copyLayerRef.current, {
-        y: -30,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroSectionRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.2,
-        },
-      });
-    }
-
-    // Layer 3 Card Deck Column Parallax
-    if (cardDeckLayerRef.current) {
+    // Gentle scale effect on hero cards during pin
+    if (cardDeckLayerRef.current && heroSectionRef.current) {
       gsap.to(cardDeckLayerRef.current, {
-        y: -100,
+        scale: 0.98,
         ease: 'none',
         scrollTrigger: {
           trigger: heroSectionRef.current,
           start: 'top top',
           end: 'bottom top',
-          scrub: 1.5,
+          scrub: true,
         },
       });
     }

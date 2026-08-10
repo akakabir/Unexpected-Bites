@@ -177,12 +177,18 @@ export default function KitchenVideoBackground({
         scrollTriggerInstance.kill();
       }
 
-      // Smoothly scrub video currentTime across Hero section scroll duration without pinning (prevents layout overlaps and giant blank gaps)
+      // Calculate scroll pin distance proportional to video duration so scrolling stays pinned until video finishes
+      const duration = (v.duration && !isNaN(v.duration) && v.duration > 0) ? v.duration : 6;
+      const pinDistance = Math.max(1000, Math.round(duration * 250));
+
       scrollTriggerInstance = ScrollTrigger.create({
         trigger: heroRef.current,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
         start: 'top top',
-        end: 'bottom top',
-        scrub: 0.2,
+        end: `+=${pinDistance}`,
+        scrub: 0.1,
         onUpdate: (self) => {
           if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
             targetVideoTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
