@@ -77,7 +77,7 @@ export default function Navbar({
             <img
               src="/images/unexpected-bites-logo.png"
               alt="Unexpected Bites"
-              className="w-9 h-9 rounded-full object-cover shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform shrink-0"
+              className="w-9 h-9 rounded-full object-cover group-hover:scale-105 transition-transform shrink-0"
             />
             <div className="flex flex-col">
               <span className="font-serif font-bold text-base sm:text-lg tracking-wider text-[var(--theme-text)] group-hover:text-amber-400 transition-colors flex items-center gap-1.5">

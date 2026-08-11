@@ -140,30 +140,38 @@
   background: var(--theme-accent-500);
 }
 
+/* Clean flat aesthetic - Remove image and card box shadows & drop shadows */
+img {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.shadow-\[6px_6px_0_0_var\(--theme-text\)\],
+.shadow-\[4px_4px_0_0_var\(--theme-text\)\],
+.shadow-\[8px_8px_0_0_var\(--theme-text\)\],
+.shadow-\[3px_3px_0_0_var\(--theme-text\)\] {
+  box-shadow: none !important;
+}
+
 @media (max-width: 768px) {
-  /* Reduced shadows for crisp, clean mobile experience without visual clutter */
   .shadow-2xl,
   .shadow-xl,
   .shadow-lg,
-  .shadow-\[6px_6px_0_0_var\(--theme-text\)\] {
-    box-shadow: 2px 2px 0 0 var(--theme-text) !important;
-  }
-
+  .shadow-\[6px_6px_0_0_var\(--theme-text\)\],
   .shadow-\[4px_4px_0_0_var\(--theme-text\)\] {
-    box-shadow: 2px 2px 0 0 var(--theme-text) !important;
+    box-shadow: none !important;
   }
 
   .shadow-\[0_10px_20px_rgba\(0\,0\,0\,0\.5\)\] {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: none !important;
   }
 
-  /* Make images lighter and clearer so no content or detail is obscured */
   img {
-    filter: brightness(1.03) contrast(1.02);
+    filter: none !important;
   }
 
   .glass-panel {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: none !important;
   }
 }
 

@@ -81,9 +81,9 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
           {/* Master Culinary Collective Box */}
           <motion.div
             whileHover={{ y: -4, scale: 1.01 }}
-            className="p-4.5 rounded-2xl glass-panel border border-amber-500/30 flex items-center gap-4 mt-2 bg-[var(--theme-surface-elevated)] shadow-xl relative overflow-hidden"
+            className="p-4.5 rounded-2xl glass-panel border border-amber-500/30 flex items-center gap-4 mt-2 bg-[var(--theme-surface-elevated)] shadow-none relative overflow-hidden"
           >
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-500 shrink-0 shadow-lg">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-500 shrink-0 shadow-none">
               <img loading="lazy"
                 src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=200&q=75&fm=webp"
                 alt="Culinary Team"

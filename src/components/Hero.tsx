@@ -242,7 +242,7 @@ export default function Hero({
                   style={{ transform: 'translateZ(45px)' }}
                   animate={{ y: [0, 10, 0] }}
                   transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                  className="absolute -bottom-6 -right-6 z-30 bg-emerald-400 border-3 border-[var(--theme-text)] p-3 rounded-2xl shadow-[4px_4px_0_0_var(--theme-text)] flex items-center gap-2.5 text-stone-950 pointer-events-none"
+                  className="absolute -bottom-6 -right-6 z-30 bg-emerald-400 border-3 border-[var(--theme-text)] p-3 rounded-2xl shadow-none flex items-center gap-2.5 text-stone-950 pointer-events-none"
                 >
                   <div className="w-9 h-9 rounded-xl bg-emerald-300 border-2 border-stone-950 flex items-center justify-center font-black">
                     <Zap className="w-5 h-5 fill-stone-950" />
@@ -263,7 +263,7 @@ export default function Hero({
                         animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                         exit={{ opacity: 0, scale: 0.92, y: -30, rotate: 4 }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                        className="absolute inset-0 rounded-3xl overflow-hidden border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] flex flex-col justify-between p-5 group bg-[var(--theme-surface)] [transform-style:preserve-3d]"
+                        className="absolute inset-0 rounded-3xl overflow-hidden border-3 border-[var(--theme-text)] shadow-none flex flex-col justify-between p-5 group bg-[var(--theme-surface)] [transform-style:preserve-3d]"
                       >
                         {/* Dish Image (translateZ(20px)) */}
                         <div
@@ -276,7 +276,6 @@ export default function Hero({
                             alt={currentDish.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/10 to-transparent" />
 
                           {/* Floating Badge (translateZ(30px)) */}
                           <div

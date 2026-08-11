@@ -55,7 +55,7 @@ export default function DishModal({ dish, onClose, onAddToCart }: DishModalProps
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.88, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 280 }}
-            className="relative w-full max-w-xl glass-panel rounded-3xl overflow-hidden border border-amber-500/40 my-8 shadow-2xl z-10 bg-[var(--theme-bg)] text-[var(--theme-text)]"
+            className="relative w-full max-w-xl glass-panel rounded-3xl overflow-hidden border border-amber-500/40 my-8 shadow-none z-10 bg-[var(--theme-bg)] text-[var(--theme-text)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -84,7 +84,6 @@ export default function DishModal({ dish, onClose, onAddToCart }: DishModalProps
                 }}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--theme-bg)]/80 to-transparent pointer-events-none" />
 
               {/* Badge */}
               <div className="absolute bottom-4 left-4 flex items-center gap-2">

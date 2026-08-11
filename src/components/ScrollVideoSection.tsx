@@ -100,7 +100,7 @@ export default function ScrollVideoSection({ onNavigateToMenu }: ScrollVideoSect
       <div className="w-full flex justify-center relative z-10">
         <div
           ref={containerRef}
-          className="relative w-full max-w-6xl aspect-video overflow-hidden border-3 border-[var(--theme-text)] shadow-[8px_8px_0_0_var(--theme-text)] bg-[var(--theme-surface)] will-change-transform"
+          className="relative w-full max-w-6xl aspect-video overflow-hidden border-3 border-[var(--theme-text)] shadow-none bg-[var(--theme-surface)] will-change-transform"
         >
           <video
             ref={videoRef}

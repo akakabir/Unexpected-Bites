@@ -164,7 +164,7 @@ export default function MenuSection({
                 >
                   <div
                     onClick={() => onSelectDish(dish)}
-                    className="glass-panel rounded-3xl border border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] hover:shadow-[6px_6px_0_0_var(--theme-text)] transition-all duration-300 flex flex-col justify-between group cursor-pointer bg-[var(--theme-surface)] relative h-full [transform-style:preserve-3d]"
+                    className="glass-panel rounded-3xl border border-[var(--theme-text)] shadow-none transition-all duration-300 flex flex-col justify-between group cursor-pointer bg-[var(--theme-surface)] relative h-full [transform-style:preserve-3d]"
                   >
                     {/* Dish Card Top Image Section */}
                     <div
@@ -178,7 +178,6 @@ export default function MenuSection({
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         loading="lazy"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)]/80 via-transparent to-transparent opacity-50" />
 
                       {/* Flame Badge (translateZ(35px)) */}
                       <div

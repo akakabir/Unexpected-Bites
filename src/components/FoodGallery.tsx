@@ -72,7 +72,7 @@ export default function FoodGallery() {
             <TiltCard maxTiltX={10} maxTiltY={10} scaleOnHover={1.04} className="h-full">
               <div
                 onClick={() => setSelectedImg(img)}
-                className="group relative h-72 rounded-3xl overflow-hidden glass-panel border border-amber-500/25 hover:border-amber-500/60 cursor-pointer shadow-2xl bg-[var(--theme-surface)] h-full [transform-style:preserve-3d]"
+                className="group relative h-72 rounded-3xl overflow-hidden glass-panel border border-amber-500/25 hover:border-amber-500/60 cursor-pointer shadow-none bg-[var(--theme-surface)] h-full [transform-style:preserve-3d]"
               >
                 <img
                   src={img.url}
@@ -80,7 +80,6 @@ export default function FoodGallery() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)]/90 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
                 <div
                   style={{ transform: 'translateZ(30px)' }}

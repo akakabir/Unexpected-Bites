@@ -142,7 +142,7 @@ export default function WhyChooseUs() {
               glareEffect={true}
               className="w-full"
             >
-              <div className={`glass-panel rounded-3xl overflow-hidden border border-amber-500/25 hover:border-amber-500/60 transition-all duration-300 group flex flex-col md:flex-row ${!isEven ? 'md:flex-row-reverse' : ''} shadow-2xl bg-[var(--theme-surface)] [transform-style:preserve-3d]`}>
+              <div className={`glass-panel rounded-3xl overflow-hidden border border-amber-500/25 hover:border-amber-500/60 transition-all duration-300 group flex flex-col md:flex-row ${!isEven ? 'md:flex-row-reverse' : ''} shadow-none bg-[var(--theme-surface)] [transform-style:preserve-3d]`}>
                 {/* Image Section */}
                 <div className="relative h-64 md:h-80 w-full md:w-1/2 overflow-hidden bg-[var(--theme-bg)] shrink-0">
                   <img loading="lazy"
@@ -150,13 +150,12 @@ export default function WhyChooseUs() {
                     alt={card.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[var(--theme-bg)] to-transparent ${!isEven ? 'md:bg-gradient-to-l' : ''} opacity-80 md:opacity-100`} />
 
                   {/* Floating Stat Badge */}
                   <div
                     ref={(el) => { badgeRefs.current[idx] = el; }}
                     style={{ transform: 'translateZ(35px)' }}
-                    className={`absolute bottom-4 ${isEven ? 'right-4' : 'left-4'} bg-[var(--theme-bg)] backdrop-blur-md text-amber-400 border border-amber-500/40 font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-[0_10px_25px_rgba(0,0,0,0.6)]`}
+                    className={`absolute bottom-4 ${isEven ? 'right-4' : 'left-4'} bg-[var(--theme-bg)] backdrop-blur-md text-amber-400 border border-amber-500/40 font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-none`}
                   >
                     <Icon className="w-3.5 h-3.5 text-amber-400" />
                     <span>{card.stat}</span>

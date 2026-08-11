@@ -76,7 +76,7 @@ export default function VideoShowcase({ onNavigateToMenu }: VideoShowcaseProps) 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="relative w-full aspect-video rounded-3xl overflow-hidden glass-panel border border-amber-500/40 shadow-2xl bg-[var(--theme-bg)] group"
+            className="relative w-full aspect-video rounded-3xl overflow-hidden glass-panel border border-amber-500/40 shadow-none bg-[var(--theme-bg)] group"
           >
             <video
               ref={mainVideoRef}
@@ -176,7 +176,7 @@ export default function VideoShowcase({ onNavigateToMenu }: VideoShowcaseProps) 
                 onClick={() => handleSelectVideo(reel)}
                 className={`p-3.5 rounded-2xl cursor-pointer transition-all border flex items-center gap-4 will-change-transform transform-gpu [backface-visibility:hidden] ${
                   isSelected
-                    ? 'bg-amber-500/15 border-amber-500/60 shadow-xl'
+                    ? 'bg-amber-500/15 border-amber-500/60 shadow-none'
                     : 'bg-[var(--theme-surface-elevated)]/90 border-stone-800/80 hover:border-stone-700'
                 }`}
               >
@@ -224,7 +224,7 @@ export default function VideoShowcase({ onNavigateToMenu }: VideoShowcaseProps) 
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-[var(--theme-bg)]/95 backdrop-blur-2xl flex items-center justify-center p-4"
           >
-            <div className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden bg-black border border-amber-500/30 shadow-2xl">
+            <div className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden bg-black border border-amber-500/30 shadow-none">
               <video
                 ref={modalVideoRef}
                 src={fullScreenModal.videoUrl}
