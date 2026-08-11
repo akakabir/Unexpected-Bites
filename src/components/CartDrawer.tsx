@@ -1,7 +1,14 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../types';
-import { X, Trash2, Plus, Minus, ShoppingBag, Phone, ArrowRight, Sparkles } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, Phone, ArrowRight, Sparkles, Ticket } from 'lucide-react';
 import { BRAND_CONFIG } from '../theme/tokens';
+import {
+  calculateInvoice,
+  generatePrewrittenOrderMessage,
+  checkDeviceDiscountStatus,
+  redeemDeviceDiscount,
+} from '../utils/orderInvoice';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -22,27 +29,33 @@ export default function CartDrawer({
   onClearCart,
   onCheckout,
 }: CartDrawerProps) {
-  const subtotal = cart.reduce((acc, item) => acc + item.dish.price * item.quantity, 0);
-  const deliveryFee = subtotal > 0 ? (subtotal > 800 ? 0 : 40) : 0;
-  const taxes = Math.round(subtotal * 0.05);
-  const grandTotal = subtotal + deliveryFee + taxes;
+  const [discountVersion, setDiscountVersion] = useState(0);
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [promoMessage, setPromoMessage] = useState<string | null>(null);
+
+  // Sync discount updates across AI chat & cart drawer
+  useEffect(() => {
+    const handleDiscountChange = () => setDiscountVersion((v) => v + 1);
+    window.addEventListener('ub_discount_changed', handleDiscountChange);
+    return () => window.removeEventListener('ub_discount_changed', handleDiscountChange);
+  }, []);
+
+  const invoice = calculateInvoice(cart);
+  const discountStatus = checkDeviceDiscountStatus();
+
+  const handleApplyPromoCode = () => {
+    const res = redeemDeviceDiscount();
+    if (res.success) {
+      setPromoMessage('🎉 ₹10 Device Discount applied!');
+    } else {
+      setPromoMessage(res.message);
+    }
+    setPromoCodeInput('');
+  };
 
   const handleWhatsAppOrder = () => {
     if (cart.length === 0) return;
-
-    let itemsText = cart
-      .map(
-        (item) =>
-          `• ${item.quantity}x ${item.dish.name} (₹${item.dish.price * item.quantity})${
-            item.customNotes ? ` [Note: ${item.customNotes}]` : ''
-          }`
-      )
-      .join('\n');
-
-    const message = `Hi ${BRAND_CONFIG.name}! I'd like to place an order:\n\n${itemsText}\n\nSubtotal: ₹${subtotal}\nDelivery: ${
-      deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`
-    }\nGST (5%): ₹${taxes}\n*Grand Total: ₹${grandTotal}*\n\nPlease confirm preparation and estimated dispatch time. Thank you!`;
-
+    const message = generatePrewrittenOrderMessage(cart);
     window.open(`https://wa.me/${BRAND_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -180,24 +193,71 @@ export default function CartDrawer({
             {/* Footer Checkout Summary */}
             {cart.length > 0 && (
               <div className="pt-4 border-t border-amber-500/20 flex flex-col gap-3">
+                {/* Voucher / Discount Box */}
+                {!invoice.hasDiscountApplied && (
+                  <div className="bg-[var(--theme-card-bg)] border border-amber-500/30 rounded-2xl p-2.5 flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 text-amber-500 font-bold">
+                        <Ticket className="w-4 h-4" />
+                        <span>Have Promo Code / Ask AI for Voucher?</span>
+                      </div>
+                      <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-bold">
+                        ₹10 OFF
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={promoCodeInput}
+                        onChange={(e) => setPromoCodeInput(e.target.value)}
+                        placeholder="Enter BITES10 or click apply"
+                        className="flex-1 bg-[var(--theme-surface)] border border border-amber-500/30 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500 uppercase font-mono text-[var(--theme-text)]"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyPromoCode}
+                        className="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs px-3 py-1.5 rounded-xl shadow transition-colors cursor-pointer"
+                      >
+                        Claim
+                      </button>
+                    </div>
+
+                    {promoMessage && (
+                      <span className="text-[11px] font-medium text-amber-400">{promoMessage}</span>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-1.5 text-xs text-[var(--theme-text-muted)] bg-[var(--theme-surface)] p-3.5 rounded-2xl border border-amber-500/20">
                   <div className="flex justify-between">
                     <span>Items Subtotal</span>
-                    <span className="text-[var(--theme-text)] font-semibold">₹{subtotal}</span>
+                    <span className="text-[var(--theme-text)] font-semibold">₹{invoice.subtotal}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Express Thermal Delivery</span>
                     <span className="text-emerald-400 font-semibold">
-                      {deliveryFee === 0 ? 'FREE (Above ₹800)' : `₹${deliveryFee}`}
+                      {invoice.deliveryFee === 0 ? 'FREE (Above ₹800)' : `₹${invoice.deliveryFee}`}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>GST (5%)</span>
-                    <span className="text-[var(--theme-text)] font-semibold">₹{taxes}</span>
+                    <span className="text-[var(--theme-text)] font-semibold">₹{invoice.taxes}</span>
                   </div>
+
+                  {invoice.hasDiscountApplied && (
+                    <div className="flex justify-between text-amber-400 font-bold bg-amber-500/10 px-2 py-1 rounded-lg border border-amber-500/20">
+                      <span className="flex items-center gap-1">
+                        <Ticket className="w-3.5 h-3.5" />
+                        <span>AI Voucher Discount (BITES10)</span>
+                      </span>
+                      <span>-₹{invoice.discountAmount}</span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between text-sm font-bold text-[var(--theme-text)] pt-2 border-t border-amber-500/20">
-                    <span>Grand Total</span>
-                    <span className="font-serif text-lg text-amber-400">₹{grandTotal}</span>
+                    <span>Grand Total Payable</span>
+                    <span className="font-serif text-lg text-amber-400">₹{invoice.grandTotal}</span>
                   </div>
                 </div>
 

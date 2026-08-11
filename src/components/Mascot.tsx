@@ -1,29 +1,37 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'motion/react';
-import { Flame, X, Send, Sparkles, MessageSquare } from 'lucide-react';
+import { Flame, X, Send, Sparkles, MessageSquare, ExternalLink, Ticket, Receipt } from 'lucide-react';
 import { sendGroqChatMessage, ChatMessage } from '../lib/groqChat';
 import { SiteContent } from '../lib/firebase';
 import { computeFloatingPositions } from '../utils/floatingButtons';
+import { CartItem } from '../types';
+import { BRAND_CONFIG } from '../theme/tokens';
+import {
+  checkDeviceDiscountStatus,
+  redeemDeviceDiscount,
+  generatePrewrittenOrderMessage,
+} from '../utils/orderInvoice';
 
 const INITIAL_ASSISTANT_MSG: ChatMessage = {
   id: 'init-msg-1',
   role: 'assistant',
-  content: "Hey! I'm the Unexpected Bites helper — ask me about the menu, prices, delivery time, or anything else 🍔",
+  content: "Hey! I'm the Unexpected Bites helper — ask me about our menu, prices, thermal delivery, or recommendations! 🍔",
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
 };
 
 const SUGGESTED_QUESTIONS = [
+  "🧾 Direct order & invoice",
   "🔥 What are your bestsellers?",
   "🍔 Recommend a juicy burger",
   "⏰ Operating hours & delivery?",
-  "🤤 Any vegetarian options?",
 ];
 
 interface MascotProps {
   siteContent?: SiteContent;
+  cart?: CartItem[];
 }
 
-export default function Mascot({ siteContent }: MascotProps) {
+export default function Mascot({ siteContent, cart = [] }: MascotProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
   const [isSpeechVisible, setIsSpeechVisible] = useState(true);
@@ -144,6 +152,75 @@ export default function Mascot({ siteContent }: MascotProps) {
     const newHistory = [...messages, userMsg];
     setMessages(newHistory);
     setInput('');
+
+    const lower = text.toLowerCase();
+    const isDiscountReq =
+      lower.includes('discount') ||
+      lower.includes('offer') ||
+      lower.includes('promo') ||
+      lower.includes('coupon') ||
+      lower.includes('voucher') ||
+      lower.includes('deal');
+
+    const isDirectOrderReq =
+      lower.includes('direct order') ||
+      lower.includes('whatsapp order') ||
+      lower.includes('invoice') ||
+      lower.includes('order message');
+
+    // 1. Handle Discount Request specifically
+    if (isDiscountReq) {
+      const { hasUsedDeviceDiscount } = checkDeviceDiscountStatus();
+      let replyContent = '';
+
+      if (hasUsedDeviceDiscount) {
+        replyContent =
+          "You have already redeemed your 1-time ₹10 device discount on this device! 🎟️\n\nHowever, you can still get **FREE Express Thermal Delivery on all orders over ₹800**! Ask me 'direct order' or click the WhatsApp order button to view your itemized invoice!";
+      } else {
+        redeemDeviceDiscount();
+        replyContent =
+          "🎉 Yes! I have activated an exclusive **₹10 Discount** for your order! 🎟️\n\nCode: **BITES10** (-₹10 off).\nI've automatically included this ₹10 discount in your cart & invoice calculation! *(Note: This welcome discount is valid ONCE per device)*.\n\nWould you like me to generate your prewritten WhatsApp direct order message & itemized invoice now? 🍔";
+      }
+
+      const assistantMsg: ChatMessage = {
+        id: `asst-${Date.now()}`,
+        role: 'assistant',
+        content: replyContent,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+      return;
+    }
+
+    // 2. Handle Direct Order / Invoice Request
+    if (isDirectOrderReq) {
+      if (cart.length === 0) {
+        const assistantMsg: ChatMessage = {
+          id: `asst-${Date.now()}`,
+          role: 'assistant',
+          content:
+            "Your gourmet cart is currently empty! 🛒\n\nAdd your favorite burgers or cinnamon rolls to your cart, or ask me for recommendations, and I'll generate a complete prewritten WhatsApp order & itemized invoice for you! 🍔",
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+        return;
+      }
+
+      const prewrittenMsg = generatePrewrittenOrderMessage(cart);
+      const whatsappUrl = `https://wa.me/${BRAND_CONFIG.whatsappNumber}?text=${encodeURIComponent(prewrittenMsg)}`;
+
+      const assistantMsg: ChatMessage = {
+        id: `asst-${Date.now()}`,
+        role: 'assistant',
+        content: `Here is your prewritten direct WhatsApp order & itemized invoice summary:\n\n${prewrittenMsg}`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        whatsappUrl,
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+      return;
+    }
+
+    // 3. General AI Chat Query via Groq Llama 3.3
     setIsLoading(true);
 
     try {
@@ -159,7 +236,8 @@ export default function Mascot({ siteContent }: MascotProps) {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         role: 'assistant',
-        content: "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.",
+        content:
+          "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -309,6 +387,19 @@ export default function Mascot({ siteContent }: MascotProps) {
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.content}</p>
+                      {msg.whatsappUrl && (
+                        <div className="mt-3 pt-2 border-t border-emerald-500/30">
+                          <a
+                            href={msg.whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold px-3 py-1.5 rounded-xl text-xs shadow-md transition-all"
+                          >
+                            <span>Launch 1-Click WhatsApp Order</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      )}
                     </div>
                     <span className="text-[10px] text-[var(--theme-text-subtle)] font-mono mt-1 px-1 opacity-70">
                       {msg.timestamp}

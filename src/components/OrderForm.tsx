@@ -3,6 +3,7 @@ import emailjs from '@emailjs/browser';
 import { Send, Phone, CheckCircle2, AlertCircle, Sparkles, MapPin, Clock, Info } from 'lucide-react';
 import { BRAND_CONFIG } from '../theme/tokens';
 import { CartItem, OrderFormData } from '../types';
+import { generatePrewrittenOrderMessage } from '../utils/orderInvoice';
 
 interface OrderFormProps {
   cart: CartItem[];
@@ -122,10 +123,15 @@ export default function OrderForm({ cart, onClearCart }: OrderFormProps) {
   };
 
   const handleDirectWhatsApp = () => {
-    const text = encodeURIComponent(
-      `Hi ${BRAND_CONFIG.name}! My name is ${formData.fullName || 'Guest'}. Phone: ${formData.phone || 'N/A'}. Delivery Address: ${formData.deliveryAddress || 'N/A'}, PIN: ${formData.pinCode}. I'd like to place an order.`
-    );
-    window.open(`https://wa.me/${BRAND_CONFIG.whatsappNumber}?text=${text}`, '_blank');
+    const message = generatePrewrittenOrderMessage(cart, {
+      fullName: formData.fullName || 'Guest',
+      phone: formData.phone || 'N/A',
+      email: formData.email || 'N/A',
+      deliveryAddress: formData.deliveryAddress || 'N/A',
+      pinCode: formData.pinCode || '110001',
+      specialInstructions: formData.specialInstructions || '',
+    });
+    window.open(`https://wa.me/${BRAND_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (

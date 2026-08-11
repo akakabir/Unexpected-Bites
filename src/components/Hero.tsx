@@ -218,7 +218,7 @@ export default function Hero({
             </MagneticButton>
 
             <motion.a
-              href={`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent('Hi! I would like to place an order.')}`}
+              href={`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent('Hi Unexpected Bites! 👋 I would like to place a direct order. Please send me the menu & current specials, or help me generate my itemized order invoice!')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-stone-950 font-serif font-black text-lg px-8 py-4 rounded-full border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] transition-transform active:translate-y-1 active:translate-x-1 active:shadow-[0px_0px_0_0_var(--theme-text)]"

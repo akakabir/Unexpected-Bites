@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BrandConfig, CartItem, PageTab } from '../types';
 import { SiteContent } from '../lib/firebase';
 import { computeFloatingPositions } from '../utils/floatingButtons';
+import { generatePrewrittenOrderMessage } from '../utils/orderInvoice';
 
 interface NavbarProps {
   brandConfig: BrandConfig;
@@ -51,8 +52,8 @@ export default function Navbar({
   ];
 
   const handleWhatsAppClick = () => {
-    const text = encodeURIComponent(`Hi! I'd like to place an order from ${brandConfig.name}.`);
-    window.open(`https://wa.me/${brandConfig.whatsappNumber}?text=${text}`, '_blank');
+    const text = generatePrewrittenOrderMessage(cart);
+    window.open(`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   return (
@@ -134,12 +135,12 @@ export default function Navbar({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onOpenCart}
-                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
+                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
                 aria-label="Open Cart"
               >
                 <ShoppingBag className="w-4.5 h-4.5 stroke-[2.5]" />
                 {totalCartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
+                  <span className="absolute -top-1.5 -right-1.5 bg-stone-950 text-amber-400 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
                     {totalCartCount}
                   </span>
                 )}
@@ -179,12 +180,12 @@ export default function Navbar({
             whileTap={{ scale: 0.95 }}
             onClick={onOpenCart}
             style={cartInfo.style}
-            className="relative flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2.5 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer z-[70]"
+            className="relative flex items-center justify-center w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-black transition-all border-2.5 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer z-[70]"
             aria-label="Open Cart"
           >
             <ShoppingBag className="w-5 h-5 stroke-[2.5]" />
             {totalCartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-xs w-5.5 h-5.5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
+              <span className="absolute -top-1.5 -right-1.5 bg-stone-950 text-amber-400 font-black text-xs w-5.5 h-5.5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
                 {totalCartCount}
               </span>
             )}

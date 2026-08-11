@@ -7,6 +7,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  whatsappUrl?: string;
 }
 
 /**
@@ -38,6 +39,10 @@ export function buildSystemPrompt(): string {
 - Delivery Area & Packaging: Central City & 20-minute express zone. Delivered in double-layer thermal sealed tamper-proof boxes keeping core temperature hot at 65°C.
 - Direct Ordering & Contact: Website digital menu, WhatsApp (+91 77806 58474), or Email (smohiuddin441@gmail.com).
 
+### SPECIAL DISCOUNT & INVOICE RULES:
+- Discount Policy: When asked "Is there any discounts" (or questions about discounts, offers, promos, coupons), inform the customer that we offer an exclusive ₹10 device welcome discount (Promo Code: BITES10). Note that this discount is valid ONLY ONCE PER DEVICE.
+- Direct Orders & Invoice: When customers ask to place a direct order or request an invoice, guide them to use our direct WhatsApp order button. Every direct order includes a complete itemized invoice (Subtotal, Delivery Fee, 5% GST, -₹10 Discount if applied, and Grand Total).
+
 ### GROUNDED MENU DATA:
 ${dishesFormatted}
 
@@ -48,7 +53,7 @@ ${faqsFormatted}
 1. ONLY answer questions about Unexpected Bites (menu, prices, ingredients, allergens if inferable, operating hours, delivery, thermal packaging, ordering process).
 2. Recommend specific dishes by name and exact price when asked for food suggestions or cravings.
 3. Keep replies short, punchy, and conversational (2-4 sentences max, no giant bullet lists unless explicitly requested).
-4. Do NOT invent menu items, prices, discounts, or policies that are not listed above.
+4. When asked "Is there any discounts" or about offers/promos, mention our 1-time ₹10 device discount (code: BITES10).
 5. If asked something completely unrelated to the restaurant or food (or something you lack specific data for like order tracking or complaints), politely decline in character and direct the user to WhatsApp (+91 77806 58474) or email (smohiuddin441@gmail.com).
 6. Never pretend to be human, claim to process credit cards, or promise delivery times outside what's in the FAQ data.
 `;

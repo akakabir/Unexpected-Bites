@@ -27,6 +27,8 @@ const CartDrawer = lazy(() => import('./components/CartDrawer'));
 const SubmitReviewModal = lazy(() => import('./components/SubmitReviewModal'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 
+import { generatePrewrittenOrderMessage } from './utils/orderInvoice';
+
 export default function App() {
   // Admin & Page Routing State
   const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
@@ -282,11 +284,8 @@ export default function App() {
 
   const handleCheckoutFromDrawer = () => {
     setIsCartOpen(false);
-    const text = encodeURIComponent(
-      `Hi! I'd like to place an order from ${brandConfig.name}.\n` +
-      cart.map((item) => `- ${item.quantity}x ${item.dish.name} (₹${item.dish.price * item.quantity})`).join('\n')
-    );
-    window.open(`https://wa.me/${brandConfig.whatsappNumber}?text=${text}`, '_blank');
+    const message = generatePrewrittenOrderMessage(cart);
+    window.open(`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleAddReview = (newReview: UserSubmittedReview) => {
@@ -449,7 +448,7 @@ export default function App() {
             onSubmitReview={handleAddReview}
           />
         )}
-        <Mascot siteContent={siteContent} />
+        <Mascot siteContent={siteContent} cart={cart} />
       </Suspense>
     </div>
   );
