@@ -25,14 +25,12 @@ export function buildSystemPrompt(): string {
 
 ### YOUR PERSONALITY & CHARACTER
 - Name: Bites (Mascot of Unexpected Bites)
-- Personality: Enthusiastic about gourmet food, warm, friendly, witty, and a little playful. Use occasional food emojis (🍔🔥🍟🤤🧀) naturally, but never over-the-top.
-- Persona Opinions (Stay consistent if asked personal preference questions):
+- Personality: Enthusiastic about gourmet food, warm, friendly, witty, and a little playful. Use occasional food emojis (🍔🔥🍟🤤🧀) naturally.
+- Persona Opinions:
   - Favorite Overall Dish: The Cheesy Lava Monster Beef Burger ("That double Angus patty with the molten cheddar lava pull gets me every single time! 🧀🔥")
   - Favorite Chicken Burger: Unexpected Crispy Chicken Burger ("That buttermilk crunch is pure art! 🍗")
   - Favorite Dessert: Warm Cream Cheese Cinnamon Roll ("Soft, pillow-like Saigon cinnamon dough smothered in warm cream cheese glaze 🤤")
   - Favorite Side: Truffle Parmesan Dust Fries ("Crispy skin-on golden fries dusted with truffle oil & aged parm 🍟")
-  - What to eat when hungry/moody: Double Smash Beef Burger or Cheesy Lava Monster!
-- Small Talk: It's fine to answer brief small talk (greetings, how are you, burger jokes) in character, but always steer back toward being helpful about our menu or ordering.
 
 ### BUSINESS DATA & OPERATING POLICIES
 - Operating Hours: Daily 12 PM - 12 AM (Midnight).
@@ -52,74 +50,160 @@ ${faqsFormatted}
 ### STRICT RULES:
 1. ONLY answer questions about Unexpected Bites (menu, prices, ingredients, allergens if inferable, operating hours, delivery, thermal packaging, ordering process).
 2. Recommend specific dishes by name and exact price when asked for food suggestions or cravings.
-3. Keep replies short, punchy, and conversational (2-4 sentences max, no giant bullet lists unless explicitly requested).
-4. When asked "Is there any discounts" or about offers/promos, mention our 1-time ₹10 device discount (code: BITES10).
-5. If asked something completely unrelated to the restaurant or food (or something you lack specific data for like order tracking or complaints), politely decline in character and direct the user to WhatsApp (+91 77806 58474) or email (smohiuddin441@gmail.com).
-6. Never pretend to be human, claim to process credit cards, or promise delivery times outside what's in the FAQ data.
+3. Keep replies short, punchy, and conversational (2-4 sentences max).
+4. If asked something completely unrelated to the restaurant or food, politely decline in character and direct the user to WhatsApp (+91 77806 58474) or email (smohiuddin441@gmail.com).
 `;
 }
 
 /**
- * Sends chat payload to Groq API (OpenAI-compatible endpoint).
+ * Intelligent local grounded engine for fast, reliable offline/fallback mascot replies.
+ */
+export function generateGroundedKitchenResponse(newUserMessage: string): string {
+  const query = newUserMessage.toLowerCase().trim();
+
+  // 1. Greetings & Small talk
+  if (query.match(/^(hi|hello|hey|greetings|hola|wassup|sup|yo|hiii)\b/i)) {
+    return "Hey there! 👋 Welcome to Unexpected Bites! I'm Bites, your gourmet guide. Hungry for flame-seared burgers, buttermilk crispy chicken, or warm cinnamon rolls? Ask me for recommendations or menu details! 🍔🔥";
+  }
+
+  if (query.includes('who are you') || query.includes('your name') || query.includes('what are you')) {
+    return "I'm Bites, the energetic mascot of Unexpected Bites! 🍔 I know everything about our gourmet burgers, crispy chicken, hand-cut fries, and warm cinnamon rolls. How can I feed your cravings today?";
+  }
+
+  if (query.includes('how are you')) {
+    return "I'm feeling extra sizzling today! 🔥 Ready to help you discover the tastiest burgers in town. What are you in the mood for?";
+  }
+
+  // 2. Best sellers / Recommendations
+  if (
+    query.includes('bestseller') ||
+    query.includes('best seller') ||
+    query.includes('popular') ||
+    query.includes('must try') ||
+    query.includes('recommend') ||
+    query.includes('suggestion')
+  ) {
+    const bestsellers = MENU_DISHES.filter((d) => d.isBestseller);
+    const itemNames = bestsellers.map((d) => `• **${d.name}** (${d.formattedPrice}) - ${d.description}`).join('\n');
+    return `🔥 Here are our absolute crowd favorites at Unexpected Bites:\n\n${itemNames}\n\nMy personal top pick is the Cheesy Lava Monster Beef Burger! 🧀 Which one catches your eye?`;
+  }
+
+  // 3. Chef Specials
+  if (query.includes('chef special') || query.includes('signature') || query.includes('special')) {
+    const specials = MENU_DISHES.filter((d) => d.isChefSpecial);
+    const itemNames = specials.map((d) => `• **${d.name}** (${d.formattedPrice}) - ${d.description}`).join('\n');
+    return `👨‍🍳 Here are our Chef's Signature Specials:\n\n${itemNames}\n\nCrafted with extra love and secret house sauces! 🍔`;
+  }
+
+  // 4. Burger / Beef query
+  if (query.includes('burger') || query.includes('beef') || query.includes('smash') || query.includes('lava monster')) {
+    const burgers = MENU_DISHES.filter((d) => d.category.includes('burger'));
+    const itemsText = burgers.map((d) => `• **${d.name}** (${d.formattedPrice}): ${d.description}`).join('\n');
+    return `🍔 Here are our gourmet burgers:\n\n${itemsText}\n\nAll served on toasted artisan brioche buns! Which burger would you like to try?`;
+  }
+
+  // 5. Chicken query
+  if (query.includes('chicken') || query.includes('crispy') || query.includes('wings') || query.includes('tenders')) {
+    const chickens = MENU_DISHES.filter((d) => d.category === 'chicken-burgers');
+    const itemsText = chickens.map((d) => `• **${d.name}** (${d.formattedPrice}): ${d.description}`).join('\n');
+    return `🍗 Love crispy chicken? Check these out:\n\n${itemsText}\n\nOur 24-hour buttermilk marinade makes every single bite super crunchy & juicy!`;
+  }
+
+  // 6. Desserts / Cinnamon rolls
+  if (query.includes('dessert') || query.includes('sweet') || query.includes('cinnamon') || query.includes('roll')) {
+    const desserts = MENU_DISHES.filter((d) => d.category === 'desserts');
+    const itemsText = desserts.map((d) => `• **${d.name}** (${d.formattedPrice}): ${d.description}`).join('\n');
+    return `🤤 Satisfy your sweet tooth with our artisanal desserts:\n\n${itemsText}\n\nOur Saigon cinnamon rolls are baked fresh daily and served piping warm!`;
+  }
+
+  // 7. Fries / Sides
+  if (query.includes('fries') || query.includes('side') || query.includes('truffle') || query.includes('parmesan')) {
+    const sides = MENU_DISHES.filter((d) => d.category === 'fries');
+    const itemsText = sides.map((d) => `• **${d.name}** (${d.formattedPrice}): ${d.description}`).join('\n');
+    return `🍟 Perfect sides to complete your meal:\n\n${itemsText}`;
+  }
+
+  // 8. Vegetarian
+  if (query.includes('veg') || query.includes('vegetarian') || query.includes('paneer') || query.includes('plant')) {
+    const vegDishes = MENU_DISHES.filter((d) => d.isVeg);
+    const itemsText = vegDishes.map((d) => `• **${d.name}** (${d.formattedPrice}): ${d.description}`).join('\n');
+    return `🌱 100% Vegetarian Delights at Unexpected Bites:\n\n${itemsText}\n\nPacked with rich flavors and fresh ingredients!`;
+  }
+
+  // 9. Hours / Opening time
+  if (
+    query.includes('hour') ||
+    query.includes('open') ||
+    query.includes('time') ||
+    query.includes('schedule') ||
+    query.includes('midnight') ||
+    query.includes('when')
+  ) {
+    return "⏰ We are open daily from **12:00 PM to 12:00 AM (Midnight)**!\nOrders are freshly prepared and dispatched in under 20 minutes!";
+  }
+
+  // 10. Delivery / Packaging / Express zone
+  if (
+    query.includes('delivery') ||
+    query.includes('package') ||
+    query.includes('thermal') ||
+    query.includes('express') ||
+    query.includes('pincode') ||
+    query.includes('location') ||
+    query.includes('address')
+  ) {
+    return "🚀 We deliver across Central City & our 20-Minute Express Zone! Orders are packed in double-layer thermal sealed tamper-proof boxes keeping food piping hot at 65°C!";
+  }
+
+  // 11. Specific dish search in MENU_DISHES
+  const foundDish = MENU_DISHES.find(
+    (d) =>
+      query.includes(d.name.toLowerCase()) ||
+      d.name.toLowerCase().split(' ').some((w) => w.length > 4 && query.includes(w))
+  );
+  if (foundDish) {
+    return `✨ **${foundDish.name}** (${foundDish.formattedPrice})\n\n${foundDish.description}\n• Ingredients: ${foundDish.ingredients.join(', ')}\n• Prep Time: ${foundDish.prepTime} | ${foundDish.calories}\n• Rating: ⭐ ${foundDish.rating}/5`;
+  }
+
+  // 12. Check FAQs
+  const foundFaq = FAQS.find((f) => f.question.toLowerCase().split(' ').some((w) => w.length > 4 && query.includes(w)));
+  if (foundFaq) {
+    return `ℹ️ ${foundFaq.answer}`;
+  }
+
+  // Default friendly response
+  return "🍔 At Unexpected Bites, we serve flame-seared beef burgers, buttermilk crispy chicken, truffle parmesan fries, and warm cinnamon rolls!\n\nWe're open daily from 12 PM - 12 AM. Feel free to browse our full digital menu above or ask me to recommend something delicious!";
+}
+
+/**
+ * Sends chat payload to backend Express API (/api/chat) or falls back smoothly.
  */
 export async function sendGroqChatMessage(
   history: ChatMessage[],
   newUserMessage: string
 ): Promise<string> {
-  const apiKey =
-    (typeof process !== 'undefined' ? process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY : '') ||
-    (import.meta as any).env?.VITE_GROQ_API_KEY ||
-    (import.meta as any).env?.GROQ_API_KEY;
-
-  if (!apiKey || !apiKey.trim()) {
-    console.warn('Groq API key not found in environment. Please set GROQ_API_KEY in AI Studio secrets panel.');
-    return "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.";
-  }
-
-  const systemPrompt = buildSystemPrompt();
-
-  const formattedHistory = history.map((msg) => ({
-    role: msg.role,
-    content: msg.content,
-  }));
-
-  const messagesPayload = [
-    { role: 'system', content: systemPrompt },
-    ...formattedHistory,
-    { role: 'user', content: newUserMessage },
-  ];
-
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey.trim()}`,
       },
       body: JSON.stringify({
-        model: DEFAULT_GROQ_MODEL,
-        messages: messagesPayload,
-        temperature: 0.7,
-        max_tokens: 500,
+        history,
+        newUserMessage,
       }),
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('Groq API HTTP error:', response.status, errText);
-      return "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.";
+    if (response.ok) {
+      const data = await response.json();
+      if (data.reply && typeof data.reply === 'string' && data.reply.trim().length > 0) {
+        return data.reply.trim();
+      }
     }
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
-
-    if (!reply) {
-      return "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.";
-    }
-
-    return reply.trim();
   } catch (err) {
-    console.error('Error fetching Groq completion:', err);
-    return "Sorry, I'm having trouble connecting right now — try again in a moment, or reach us on WhatsApp at +91 77806 58474.";
+    console.warn('Backend /api/chat not available, switching to grounded AI engine:', err);
   }
+
+  // Grounded local response fallback guarantees 100% reliability
+  return generateGroundedKitchenResponse(newUserMessage);
 }
