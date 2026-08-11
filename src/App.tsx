@@ -51,7 +51,10 @@ export default function App() {
     heroHeadline2: "Warm Artisanal Desserts",
     heroHeadline3: "Delivered In 20 Mins.",
     heroSubtitle: "Experience hand-crafted chicken and beef burgers, golden crispy fries, cold drinks, and warm cinnamon rolls and desserts prepared fresh and delivered in thermal sealed packaging.",
-    buttonStyle: "pill"
+    buttonStyle: "pill",
+    whatsappPosition: "top-right",
+    cartPosition: "top-right",
+    mascotPosition: "bottom-right",
   });
 
   // Subscribe to Firebase Realtime Database
@@ -194,6 +197,8 @@ export default function App() {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     });
 
+    (window as any).lenis = lenis;
+
     lenis.on('scroll', () => {
       ScrollTrigger.update();
     });
@@ -207,6 +212,7 @@ export default function App() {
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      (window as any).lenis = null;
       lenis.destroy();
       gsap.ticker.remove(raf);
     };
@@ -312,6 +318,7 @@ export default function App() {
         onOpenCart={() => setIsCartOpen(true)}
         currentPage={currentPage}
         onSelectPage={handleSelectPage}
+        siteContent={siteContent}
       />
 
       {/* Main Multi-Page Content */}
@@ -442,7 +449,7 @@ export default function App() {
             onSubmitReview={handleAddReview}
           />
         )}
-        <Mascot />
+        <Mascot siteContent={siteContent} />
       </Suspense>
     </div>
   );

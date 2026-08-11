@@ -85,6 +85,11 @@ export default function KitchenVideoBackground({
     }
 
     const render = () => {
+      if (document.hidden) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       if (particles.length < 35 && Math.random() < 0.3) {
@@ -166,7 +171,8 @@ export default function KitchenVideoBackground({
     let rafId: number | null = null;
     let lastTimestamp = performance.now();
     let currentVideoTime = 0.001;
-    let targetVideoTime = 0.001;
+    let desiredVideoTime = 0.001;
+    let isClampingActive = false;
 
     const setupScrollScrub = () => {
       if (!heroRef.current || !videoRef.current) return;
@@ -179,7 +185,7 @@ export default function KitchenVideoBackground({
 
       // Calculate scroll pin distance proportional to video duration so scrolling stays pinned until video finishes
       const duration = (v.duration && !isNaN(v.duration) && v.duration > 0) ? v.duration : 6;
-      const pinDistance = Math.max(1000, Math.round(duration * 250));
+      const pinDistance = Math.max(1200, Math.round(duration * 250));
 
       scrollTriggerInstance = ScrollTrigger.create({
         trigger: heroRef.current,
@@ -188,45 +194,93 @@ export default function KitchenVideoBackground({
         anticipatePin: 1,
         start: 'top top',
         end: `+=${pinDistance}`,
-        scrub: 0.1,
         onUpdate: (self) => {
           if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
-            targetVideoTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
+            const scrollTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
+            
+            if (!isClampingActive) {
+              desiredVideoTime = scrollTime;
+            } else {
+              if (scrollTime > desiredVideoTime) {
+                desiredVideoTime = scrollTime;
+              } else if (self.direction < 0 && scrollTime < currentVideoTime) {
+                desiredVideoTime = scrollTime;
+              }
+            }
           }
         },
         onLeave: () => {
           if (v && v.duration) {
-            targetVideoTime = Math.max(0.001, v.duration - 0.05);
+            desiredVideoTime = Math.max(0.001, v.duration - 0.05);
           }
         },
         onLeaveBack: () => {
-          targetVideoTime = 0.001;
+          desiredVideoTime = 0.001;
         }
       });
 
-      // RAF loop to cap playback rate at 1x maximum
       lastTimestamp = performance.now();
 
       const updateVideoFrame = () => {
         const now = performance.now();
-        const dt = Math.min((now - lastTimestamp) / 1000, 0.1); // delta time in seconds, clamped
+        const dt = Math.min((now - lastTimestamp) / 1000, 0.1);
         lastTimestamp = now;
 
-        if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
-          if (Math.abs(currentVideoTime - targetVideoTime) > 0.005) {
-            const maxStep = dt * 1.0; // Capped to 1x video playback speed
-            if (currentVideoTime < targetVideoTime) {
-              const step = Math.min(targetVideoTime - currentVideoTime, maxStep);
-              currentVideoTime += step;
-            } else {
-              const step = Math.min(currentVideoTime - targetVideoTime, maxStep);
-              currentVideoTime -= step;
-            }
+        if (v && v.duration && !isNaN(v.duration) && v.duration > 0 && scrollTriggerInstance) {
+          const startY = scrollTriggerInstance.start;
+          const pinDist = scrollTriggerInstance.end - scrollTriggerInstance.start;
+          const currentScrollY = window.scrollY || window.pageYOffset;
+
+          const maxStep = dt * 1.0; // Strictly 1x playback speed cap
+          let isMovingForward = true;
+
+          if (currentVideoTime < desiredVideoTime) {
+            currentVideoTime = Math.min(desiredVideoTime, currentVideoTime + maxStep);
+            isMovingForward = true;
+          } else if (currentVideoTime > desiredVideoTime) {
+            currentVideoTime = Math.max(desiredVideoTime, currentVideoTime - maxStep);
+            isMovingForward = false;
+          }
+
+          if (Math.abs(v.currentTime - currentVideoTime) > 0.005) {
             try {
               v.currentTime = currentVideoTime;
             } catch {
               // Ignore seek errors
             }
+          }
+
+          const videoProgress = currentVideoTime / v.duration;
+
+          // Scroll Gate: hold scroll position in hero until video catches up / finishes
+          if (currentScrollY >= startY) {
+            if (videoProgress < 0.98) {
+              const allowedScrollY = startY + videoProgress * pinDist;
+
+              if (isMovingForward && currentScrollY > allowedScrollY + 2) {
+                isClampingActive = true;
+                if ((window as any).lenis) {
+                  (window as any).lenis.scrollTo(allowedScrollY, { immediate: true });
+                } else {
+                  window.scrollTo(0, allowedScrollY);
+                }
+              } else if (!isMovingForward && currentScrollY < allowedScrollY - 2) {
+                isClampingActive = true;
+                if ((window as any).lenis) {
+                  (window as any).lenis.scrollTo(allowedScrollY, { immediate: true });
+                } else {
+                  window.scrollTo(0, allowedScrollY);
+                }
+              } else {
+                isClampingActive = false;
+              }
+            } else {
+              isClampingActive = false;
+            }
+          } else {
+            isClampingActive = false;
+            currentVideoTime = 0.001;
+            desiredVideoTime = 0.001;
           }
         }
 
@@ -303,12 +357,13 @@ export default function KitchenVideoBackground({
       <motion.img
         src={posterImage}
         alt="Pan-Seared Fried Rice with Peas and Carrots in Wok"
-        initial={{ scale: 1.05 }}
-        animate={{ scale: [1.05, 1.08, 1.05] }}
+        initial={{ scale: 1.15 }}
+        animate={{ scale: [1.15, 1.18, 1.15] }}
         transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+        className={`absolute inset-0 w-full h-full object-cover object-bottom scale-115 transition-opacity duration-1000 ${
           isLoaded && !hasError ? 'opacity-20' : 'opacity-100'
         }`}
+        style={{ objectPosition: '50% 100%' }}
       />
 
       {/* HTML5 Video Layer */}
@@ -327,7 +382,8 @@ export default function KitchenVideoBackground({
           console.warn("Video failed to play, switching to cinemagraph fallback.");
           setHasError(true);
         }}
-        className="absolute inset-0 w-full h-full object-cover scale-105 transition-opacity duration-700"
+        className="absolute inset-0 w-full h-full object-cover object-center scale-100 transition-opacity duration-700"
+        style={{ objectPosition: '50% 100%' }}
       />
 
       {/* Steam & Sizzle Particles Canvas */}
@@ -336,15 +392,14 @@ export default function KitchenVideoBackground({
         className="absolute inset-0 w-full h-full pointer-events-none opacity-80"
       />
 
-      {/* Multi-layered Vignette & Brand Gradient Overlay */}
+      {/* Multi-layered Vignette & Dark Overlay for Text Contrast (NO bottom fade-to-light-bg!) */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 100%)`,
+          background: `radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%)`,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--theme-bg)] via-[var(--theme-bg)]/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[var(--theme-bg)] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/45 pointer-events-none" />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'motion/react';
 import { Flame, X, Send, Sparkles, MessageSquare } from 'lucide-react';
 import { sendGroqChatMessage, ChatMessage } from '../lib/groqChat';
+import { SiteContent } from '../lib/firebase';
+import { computeFloatingPositions } from '../utils/floatingButtons';
 
 const INITIAL_ASSISTANT_MSG: ChatMessage = {
   id: 'init-msg-1',
@@ -17,7 +19,11 @@ const SUGGESTED_QUESTIONS = [
   "🤤 Any vegetarian options?",
 ];
 
-export default function Mascot() {
+interface MascotProps {
+  siteContent?: SiteContent;
+}
+
+export default function Mascot({ siteContent }: MascotProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
   const [isSpeechVisible, setIsSpeechVisible] = useState(true);
@@ -31,6 +37,11 @@ export default function Mascot() {
   const containerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
+
+  const floatingPositions = computeFloatingPositions(siteContent);
+  const mascotPosInfo = floatingPositions.mascot;
+  const isLeftCorner = mascotPosInfo.corner.includes('left');
+  const isTopCorner = mascotPosInfo.corner.includes('top');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -160,7 +171,12 @@ export default function Mascot() {
   return (
     <>
       {/* Interactive Floating Mascot Button & Idle Speech Bubble */}
-      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[70] flex items-end gap-3 pointer-events-none">
+      <div 
+        style={mascotPosInfo.style}
+        className={`fixed z-[70] flex items-end gap-3 pointer-events-none transition-all duration-300 ${
+          isLeftCorner ? 'flex-row-reverse' : 'flex-row'
+        }`}
+      >
         {/* Comic Speech Bubble - Hides on Scroll or when Chat is Open */}
         <AnimatePresence>
           {isSpeechVisible && !isChatOpen && (
@@ -182,7 +198,7 @@ export default function Mascot() {
                 </span>
               </div>
               {/* Bubble Tail */}
-              <div className="absolute -bottom-3 right-4 w-4 h-4 bg-[var(--theme-surface)] border-b-3 border-r-3 border-[var(--theme-text)] transform rotate-45 group-hover:bg-[var(--theme-card-bg)] transition-colors" />
+              <div className={`absolute -bottom-3 ${isLeftCorner ? 'left-4' : 'right-4'} w-4 h-4 bg-[var(--theme-surface)] border-b-3 border-r-3 border-[var(--theme-text)] transform rotate-45 group-hover:bg-[var(--theme-card-bg)] transition-colors`} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -201,7 +217,7 @@ export default function Mascot() {
           {/* Eyes Container */}
           <div className="flex gap-2.5 mb-2.5 z-10">
             {/* Left Eye */}
-            <div className="w-2.5 h-3 bg-white rounded-full border-1.5 border-[var(--theme-text)] overflow-hidden relative">
+            <div className="w-2.5 h-3 bg-[#FAF8F5] rounded-full border-1.5 border-[var(--theme-text)] overflow-hidden relative">
               <motion.div
                 animate={isMobile ? controls : { x: mousePos.x, y: mousePos.y }}
                 transition={isMobile ? {} : { type: 'spring', stiffness: 450, damping: 28 }}
@@ -209,7 +225,7 @@ export default function Mascot() {
               />
             </div>
             {/* Right Eye */}
-            <div className="w-2.5 h-3 bg-white rounded-full border-1.5 border-[var(--theme-text)] overflow-hidden relative">
+            <div className="w-2.5 h-3 bg-[#FAF8F5] rounded-full border-1.5 border-[var(--theme-text)] overflow-hidden relative">
               <motion.div
                 animate={isMobile ? controls : { x: mousePos.x, y: mousePos.y }}
                 transition={isMobile ? {} : { type: 'spring', stiffness: 450, damping: 28 }}
@@ -239,7 +255,11 @@ export default function Mascot() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', stiffness: 220, damping: 20 }}
-            className="fixed inset-x-3 bottom-24 sm:inset-auto sm:bottom-28 sm:right-8 w-[calc(100vw-24px)] sm:w-96 h-[500px] max-h-[80vh] z-[80] bg-[var(--theme-surface)] border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] rounded-2xl flex flex-col overflow-hidden pointer-events-auto"
+            className={`fixed z-[80] inset-x-3 sm:inset-auto ${
+              isTopCorner ? 'top-20 sm:top-24' : 'bottom-24 sm:bottom-28'
+            } ${
+              isLeftCorner ? 'sm:left-8 sm:right-auto' : 'sm:right-8 sm:left-auto'
+            } w-[calc(100vw-24px)] sm:w-96 h-[500px] max-h-[80vh] bg-[var(--theme-surface)] border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] rounded-2xl flex flex-col overflow-hidden pointer-events-auto`}
           >
             {/* Panel Header */}
             <div className="bg-[var(--theme-card-bg)] border-b-2 border-[var(--theme-border)] px-4 py-3 flex items-center justify-between">

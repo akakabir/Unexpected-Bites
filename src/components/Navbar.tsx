@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, Phone, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BrandConfig, CartItem, PageTab } from '../types';
+import { SiteContent } from '../lib/firebase';
+import { computeFloatingPositions } from '../utils/floatingButtons';
 
 interface NavbarProps {
   brandConfig: BrandConfig;
@@ -9,6 +11,7 @@ interface NavbarProps {
   onOpenCart: () => void;
   currentPage: PageTab;
   onSelectPage: (page: PageTab, category?: string) => void;
+  siteContent?: SiteContent;
 }
 
 export default function Navbar({
@@ -17,9 +20,14 @@ export default function Navbar({
   onOpenCart,
   currentPage,
   onSelectPage,
+  siteContent,
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const floatingPositions = computeFloatingPositions(siteContent);
+  const whatsappInfo = floatingPositions.whatsapp;
+  const cartInfo = floatingPositions.cart;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,31 +116,35 @@ export default function Navbar({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2.5">
-            {/* WhatsApp Direct Order - Sticker Style */}
-            <button
-              onClick={handleWhatsAppClick}
-              className="inline-flex items-center gap-1.5 bg-emerald-400 hover:bg-emerald-300 text-stone-950 border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] text-xs font-serif font-black px-3 py-1.5 rounded-full transition-all cursor-pointer"
-              title="Order via WhatsApp"
-            >
-              <Phone className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span className="hidden sm:inline-block">WhatsApp</span>
-            </button>
+            {/* WhatsApp Direct Order - In Navbar if top-right */}
+            {!whatsappInfo.isFloating && (
+              <button
+                onClick={handleWhatsAppClick}
+                className="inline-flex items-center gap-1.5 bg-emerald-400 hover:bg-emerald-300 text-stone-950 border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] text-xs font-serif font-black px-3 py-1.5 rounded-full transition-all cursor-pointer"
+                title="Order via WhatsApp"
+              >
+                <Phone className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span className="hidden sm:inline-block">WhatsApp</span>
+              </button>
+            )}
 
-            {/* Cart Button - Sticker Style (Orange) */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onOpenCart}
-              className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
-              aria-label="Open Cart"
-            >
-              <ShoppingBag className="w-4.5 h-4.5 stroke-[2.5]" />
-              {totalCartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
-                  {totalCartCount}
-                </span>
-              )}
-            </motion.button>
+            {/* Cart Button - In Navbar if top-right */}
+            {!cartInfo.isFloating && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onOpenCart}
+                className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2 sm:border-2.5 border-[var(--theme-text)] shadow-[3px_3px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer"
+                aria-label="Open Cart"
+              >
+                <ShoppingBag className="w-4.5 h-4.5 stroke-[2.5]" />
+                {totalCartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
+                    {totalCartCount}
+                  </span>
+                )}
+              </motion.button>
+            )}
 
             {/* Mobile Hamburger Icons - Sticker Style */}
             <div className="flex items-center gap-1.5 lg:hidden">
@@ -146,6 +158,38 @@ export default function Navbar({
             </div>
           </div>
         </div>
+
+        {/* Floating WhatsApp Button if positioned outside top-right */}
+        {whatsappInfo.isFloating && (
+          <button
+            onClick={handleWhatsAppClick}
+            style={whatsappInfo.style}
+            className="inline-flex items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-stone-950 border-2.5 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] text-xs font-serif font-black px-4 py-2.5 rounded-full transition-all cursor-pointer z-[70]"
+            title="Order via WhatsApp"
+          >
+            <Phone className="w-4 h-4 stroke-[2.5]" />
+            <span>WhatsApp</span>
+          </button>
+        )}
+
+        {/* Floating Cart Button if positioned outside top-right */}
+        {cartInfo.isFloating && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onOpenCart}
+            style={cartInfo.style}
+            className="relative flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-black transition-all border-2.5 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_var(--theme-text)] cursor-pointer z-[70]"
+            aria-label="Open Cart"
+          >
+            <ShoppingBag className="w-5 h-5 stroke-[2.5]" />
+            {totalCartCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-stone-950 font-black text-xs w-5.5 h-5.5 rounded-full flex items-center justify-center border-2 border-[var(--theme-text)] shadow-sm animate-bounce">
+                {totalCartCount}
+              </span>
+            )}
+          </motion.button>
+        )}
 
         {/* Mobile Slide-down Menu */}
         <AnimatePresence>

@@ -3,6 +3,8 @@ import { getDatabase, ref, onValue, set, push, remove, update, Database } from '
 import { Dish } from '../types';
 import { MENU_DISHES } from '../data/kitchenData';
 
+export type FloatingButtonCorner = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+
 export interface SiteContent {
   heroHeadline1?: string;
   heroHeadline2?: string;
@@ -10,6 +12,9 @@ export interface SiteContent {
   heroSubtitle?: string;
   buttonStyle?: 'pill' | 'rounded' | 'sharp';
   specialOfferText?: string;
+  whatsappPosition?: FloatingButtonCorner;
+  cartPosition?: FloatingButtonCorner;
+  mascotPosition?: FloatingButtonCorner;
 }
 
 const DEFAULT_SITE_CONTENT: SiteContent = {
@@ -18,7 +23,10 @@ const DEFAULT_SITE_CONTENT: SiteContent = {
   heroHeadline3: "Delivered In 20 Mins.",
   heroSubtitle: "Experience hand-crafted chicken and beef burgers, golden crispy fries, cold drinks, and warm cinnamon rolls and desserts prepared fresh and delivered in thermal sealed packaging.",
   buttonStyle: "pill",
-  specialOfferText: "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20"
+  specialOfferText: "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20",
+  whatsappPosition: "top-right",
+  cartPosition: "top-right",
+  mascotPosition: "bottom-right",
 };
 
 // Helper to get saved config from localStorage or env

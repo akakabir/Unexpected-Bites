@@ -68,7 +68,10 @@ export default function AdminPanel({ dishes, siteContent, onCloseAdmin }: AdminP
     heroHeadline3: siteContent.heroHeadline3 || "Delivered In 20 Mins.",
     heroSubtitle: siteContent.heroSubtitle || "Experience hand-crafted chicken and beef burgers, golden crispy fries, cold drinks, and warm cinnamon rolls and desserts prepared fresh and delivered in thermal sealed packaging.",
     buttonStyle: siteContent.buttonStyle || "pill",
-    specialOfferText: siteContent.specialOfferText || "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20"
+    specialOfferText: siteContent.specialOfferText || "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20",
+    whatsappPosition: siteContent.whatsappPosition || "top-right",
+    cartPosition: siteContent.cartPosition || "top-right",
+    mascotPosition: siteContent.mascotPosition || "bottom-right",
   });
 
   // Firebase Config Inputs
@@ -81,7 +84,10 @@ export default function AdminPanel({ dishes, siteContent, onCloseAdmin }: AdminP
       heroHeadline3: siteContent.heroHeadline3 || "Delivered In 20 Mins.",
       heroSubtitle: siteContent.heroSubtitle || "Experience hand-crafted chicken and beef burgers, golden crispy fries, cold drinks, and warm cinnamon rolls and desserts prepared fresh and delivered in thermal sealed packaging.",
       buttonStyle: siteContent.buttonStyle || "pill",
-      specialOfferText: siteContent.specialOfferText || "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20"
+      specialOfferText: siteContent.specialOfferText || "⚡ COMPLIMENTARY CINNAMON ROLL ON ORDERS OVER ₹599 | CODE: BITES20",
+      whatsappPosition: siteContent.whatsappPosition || "top-right",
+      cartPosition: siteContent.cartPosition || "top-right",
+      mascotPosition: siteContent.mascotPosition || "bottom-right",
     });
   }, [siteContent]);
 
@@ -625,6 +631,87 @@ export default function AdminPanel({ dishes, siteContent, onCloseAdmin }: AdminP
                 <p className="text-[11px] text-stone-500 mt-1">
                   Adjusts button geometry globally on the live site.
                 </p>
+              </div>
+
+              {/* Floating Action Buttons Layout Section */}
+              <div className="pt-4 border-t border-stone-800 space-y-4">
+                <div>
+                  <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+                    Layout & Floating Buttons Position
+                  </h4>
+                  <p className="text-[11px] text-stone-400">
+                    Control which corner each action button appears in. Buttons sharing a corner will stack vertically without overlapping.
+                  </p>
+                </div>
+
+                {/* WhatsApp Button Position */}
+                <div className="bg-stone-950 p-3.5 rounded-xl border border-stone-800 space-y-2">
+                  <span className="text-xs font-medium text-stone-200 block">
+                    WhatsApp Concierge Button
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => setContentForm({ ...contentForm, whatsappPosition: pos })}
+                        className={`px-3 py-1.5 rounded-lg border text-center capitalize transition-all cursor-pointer ${
+                          (contentForm.whatsappPosition || 'top-right') === pos
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400'
+                            : 'bg-stone-900 text-stone-400 border-stone-800 hover:border-stone-700'
+                        }`}
+                      >
+                        {pos.replace('-', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cart Button Position */}
+                <div className="bg-stone-950 p-3.5 rounded-xl border border-stone-800 space-y-2">
+                  <span className="text-xs font-medium text-stone-200 block">
+                    Gourmet Cart Button
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => setContentForm({ ...contentForm, cartPosition: pos })}
+                        className={`px-3 py-1.5 rounded-lg border text-center capitalize transition-all cursor-pointer ${
+                          (contentForm.cartPosition || 'top-right') === pos
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400'
+                            : 'bg-stone-900 text-stone-400 border-stone-800 hover:border-stone-700'
+                        }`}
+                      >
+                        {pos.replace('-', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mascot Chat Assistant Position */}
+                <div className="bg-stone-950 p-3.5 rounded-xl border border-stone-800 space-y-2">
+                  <span className="text-xs font-medium text-stone-200 block">
+                    AI Mascot Chat Assistant
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {(['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const).map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => setContentForm({ ...contentForm, mascotPosition: pos })}
+                        className={`px-3 py-1.5 rounded-lg border text-center capitalize transition-all cursor-pointer ${
+                          (contentForm.mascotPosition || 'bottom-right') === pos
+                            ? 'bg-amber-500 text-stone-950 font-bold border-amber-400'
+                            : 'bg-stone-900 text-stone-400 border-stone-800 hover:border-stone-700'
+                        }`}
+                      >
+                        {pos.replace('-', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="pt-2">
