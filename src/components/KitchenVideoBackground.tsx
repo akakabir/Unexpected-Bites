@@ -1,10 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Pause, Volume2, VolumeX, Upload, RefreshCw, Flame, Sparkles } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface KitchenVideoBackgroundProps {
   posterImage?: string;
@@ -136,185 +132,35 @@ export default function KitchenVideoBackground({
     };
   }, []);
 
-  // Handle Video scroll-scrub playback or mobile fallback
+  // Handle continuous video background autoplay loop
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const isMobileDevice = typeof window !== 'undefined' && (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      window.innerWidth < 768
-    );
-    const isReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Mobile / Reduced Motion Fallback: normal background loop, no scroll pinning
-    if (isMobileDevice || isReducedMotion || !heroRef || !heroRef.current) {
-      video.muted = isMuted;
-      video.loop = true;
-      video.playbackRate = 1;
-      video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-      return;
-    }
-
-    // Desktop Scroll-Scrub Mode:
-    // 1. Video stays strictly paused (on frame 0 / 0.001) when page first loads
-    video.pause();
+    video.muted = isMuted;
+    video.loop = true;
     video.playbackRate = 1;
-    try {
-      video.currentTime = 0.001;
-    } catch {
-      // Ignore initial seek error if metadata not fully ready
-    }
-    setIsPlaying(false);
 
-    let scrollTriggerInstance: ScrollTrigger | null = null;
-    let rafId: number | null = null;
-    let lastTimestamp = performance.now();
-    let currentVideoTime = 0.001;
-    let desiredVideoTime = 0.001;
-    let isClampingActive = false;
-
-    const setupScrollScrub = () => {
-      if (!heroRef.current || !videoRef.current) return;
-      const v = videoRef.current;
-      v.pause();
-
-      if (scrollTriggerInstance) {
-        scrollTriggerInstance.kill();
-      }
-
-      // Calculate scroll pin distance proportional to video duration so scrolling stays pinned until video finishes
-      const duration = (v.duration && !isNaN(v.duration) && v.duration > 0) ? v.duration : 6;
-      const pinDistance = Math.max(1200, Math.round(duration * 250));
-
-      scrollTriggerInstance = ScrollTrigger.create({
-        trigger: heroRef.current,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        start: 'top top',
-        end: `+=${pinDistance}`,
-        onUpdate: (self) => {
-          if (v && v.duration && !isNaN(v.duration) && v.duration > 0) {
-            const scrollTime = Math.max(0.001, Math.min(v.duration - 0.05, self.progress * v.duration));
-            
-            if (!isClampingActive) {
-              desiredVideoTime = scrollTime;
-            } else {
-              if (scrollTime > desiredVideoTime) {
-                desiredVideoTime = scrollTime;
-              } else if (self.direction < 0 && scrollTime < currentVideoTime) {
-                desiredVideoTime = scrollTime;
-              }
-            }
-          }
-        },
-        onLeave: () => {
-          if (v && v.duration) {
-            desiredVideoTime = Math.max(0.001, v.duration - 0.05);
-          }
-        },
-        onLeaveBack: () => {
-          desiredVideoTime = 0.001;
-        }
-      });
-
-      lastTimestamp = performance.now();
-
-      const updateVideoFrame = () => {
-        const now = performance.now();
-        const dt = Math.min((now - lastTimestamp) / 1000, 0.1);
-        lastTimestamp = now;
-
-        if (v && v.duration && !isNaN(v.duration) && v.duration > 0 && scrollTriggerInstance) {
-          const startY = scrollTriggerInstance.start;
-          const pinDist = scrollTriggerInstance.end - scrollTriggerInstance.start;
-          const currentScrollY = window.scrollY || window.pageYOffset;
-
-          const maxStep = dt * 3.0; // 3x playback speed cap (raised from 1x)
-          let isMovingForward = true;
-
-          // Ease the catch-up speed toward the cap instead of jumping straight
-          // to it. A flat linear step at 3x makes the video visibly snap/judder
-          // whenever there's a big gap to close (e.g. after a fast scroll); an
-          // exponential ease-in keeps small gaps smooth while still letting
-          // large gaps close at up to the full 3x rate.
-          const smoothing = 1 - Math.exp(-dt * 12);
-
-          if (currentVideoTime < desiredVideoTime) {
-            const distance = desiredVideoTime - currentVideoTime;
-            const step = Math.min(maxStep, distance * smoothing + dt * 0.3);
-            currentVideoTime = Math.min(desiredVideoTime, currentVideoTime + step);
-            isMovingForward = true;
-          } else if (currentVideoTime > desiredVideoTime) {
-            const distance = currentVideoTime - desiredVideoTime;
-            const step = Math.min(maxStep, distance * smoothing + dt * 0.3);
-            currentVideoTime = Math.max(desiredVideoTime, currentVideoTime - step);
-            isMovingForward = false;
-          }
-
-          const videoProgress = currentVideoTime / v.duration;
-
-          // Scroll Gate: hold scroll position in hero until video catches up / finishes
-          if (currentScrollY >= startY) {
-            if (videoProgress < 0.98) {
-              const allowedScrollY = startY + videoProgress * pinDist;
-
-              if (isMovingForward && currentScrollY > allowedScrollY + 2) {
-                isClampingActive = true;
-                if ((window as any).lenis) {
-                  (window as any).lenis.scrollTo(allowedScrollY, { immediate: true });
-                } else {
-                  window.scrollTo(0, allowedScrollY);
-                }
-              } else if (!isMovingForward && currentScrollY < allowedScrollY - 2) {
-                isClampingActive = true;
-                if ((window as any).lenis) {
-                  (window as any).lenis.scrollTo(allowedScrollY, { immediate: true });
-                } else {
-                  window.scrollTo(0, allowedScrollY);
-                }
-              } else {
-                isClampingActive = false;
-              }
-            } else {
-              isClampingActive = false;
-            }
-          } else {
-            isClampingActive = false;
-            currentVideoTime = 0.001;
-            desiredVideoTime = 0.001;
-          }
-        }
-
-        rafId = requestAnimationFrame(updateVideoFrame);
-      };
-
-      rafId = requestAnimationFrame(updateVideoFrame);
-
-      ScrollTrigger.refresh();
+    const playVideo = () => {
+      video
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          console.warn('Autoplay error:', err);
+          setIsPlaying(false);
+        });
     };
 
-    if (video.readyState >= 1) {
-      setupScrollScrub();
+    if (video.readyState >= 2) {
+      playVideo();
     } else {
-      video.addEventListener('loadedmetadata', setupScrollScrub, { once: true });
-      video.addEventListener('canplay', setupScrollScrub, { once: true });
+      video.addEventListener('canplay', playVideo, { once: true });
     }
 
     return () => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-      if (scrollTriggerInstance) {
-        scrollTriggerInstance.kill();
-      }
-      if (video) {
-        video.removeEventListener('loadedmetadata', setupScrollScrub);
-        video.removeEventListener('canplay', setupScrollScrub);
-      }
+      video.removeEventListener('canplay', playVideo);
     };
-  }, [currentVideoUrl, isMuted, heroRef]);
+  }, [currentVideoUrl, isMuted]);
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -373,6 +219,7 @@ export default function KitchenVideoBackground({
       <video
         ref={videoRef}
         src={currentVideoUrl}
+        autoPlay
         loop
         muted={isMuted}
         playsInline
