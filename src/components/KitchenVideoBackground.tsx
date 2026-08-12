@@ -231,23 +231,26 @@ export default function KitchenVideoBackground({
           const pinDist = scrollTriggerInstance.end - scrollTriggerInstance.start;
           const currentScrollY = window.scrollY || window.pageYOffset;
 
-          const maxStep = dt * 1.0; // Strictly 1x playback speed cap
+          const maxStep = dt * 3.0; // 3x playback speed cap (raised from 1x)
           let isMovingForward = true;
 
+          // Ease the catch-up speed toward the cap instead of jumping straight
+          // to it. A flat linear step at 3x makes the video visibly snap/judder
+          // whenever there's a big gap to close (e.g. after a fast scroll); an
+          // exponential ease-in keeps small gaps smooth while still letting
+          // large gaps close at up to the full 3x rate.
+          const smoothing = 1 - Math.exp(-dt * 12);
+
           if (currentVideoTime < desiredVideoTime) {
-            currentVideoTime = Math.min(desiredVideoTime, currentVideoTime + maxStep);
+            const distance = desiredVideoTime - currentVideoTime;
+            const step = Math.min(maxStep, distance * smoothing + dt * 0.3);
+            currentVideoTime = Math.min(desiredVideoTime, currentVideoTime + step);
             isMovingForward = true;
           } else if (currentVideoTime > desiredVideoTime) {
-            currentVideoTime = Math.max(desiredVideoTime, currentVideoTime - maxStep);
+            const distance = currentVideoTime - desiredVideoTime;
+            const step = Math.min(maxStep, distance * smoothing + dt * 0.3);
+            currentVideoTime = Math.max(desiredVideoTime, currentVideoTime - step);
             isMovingForward = false;
-          }
-
-          if (Math.abs(v.currentTime - currentVideoTime) > 0.005) {
-            try {
-              v.currentTime = currentVideoTime;
-            } catch {
-              // Ignore seek errors
-            }
           }
 
           const videoProgress = currentVideoTime / v.duration;
