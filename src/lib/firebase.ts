@@ -5,6 +5,26 @@ import { MENU_DISHES } from '../data/kitchenData';
 
 export type FloatingButtonCorner = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
 
+export interface SectionConfig {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+}
+
+export const DEFAULT_SECTIONS: SectionConfig[] = [
+  { id: 'hero', name: 'Hero Banner & Signature Dish', description: 'Hero visual banner, video background, headline, and interactive dish showcase', enabled: true },
+  { id: 'marquee', name: 'Marquee Quality & Trust Bar', description: 'Continuous ticker displaying express delivery, heat lock, and freshness badges', enabled: true },
+  { id: 'menu-highlights', name: 'Menu Highlights & Fast Order', description: 'Signature flame-seared burgers, crispy chicken, fries & dessert fast-order cards', enabled: true },
+  { id: 'how-it-works', name: 'How It Works (3 Steps)', description: 'Interactive 3-step order, 65°C thermal heat lock packaging, and express rider dispatch', enabled: true },
+  { id: 'why-choose-us', name: 'Why Choose Unexpected Bites', description: 'Artisanal brioche buns, farm-fresh produce, and hospital-grade kitchen hygiene', enabled: true },
+  { id: 'food-gallery', name: 'Artisanal Food Gallery', description: 'High-definition 3D tilt gallery showcasing our chef creations with interactive zoom modal', enabled: true },
+  { id: 'about-philosophy', name: 'Culinary Philosophy & Standards', description: 'Kitchen story, non-GMO cold-pressed oils, and master culinary collective pledge', enabled: true },
+  { id: 'scroll-video', name: 'Kitchen Showcase Video', description: 'Full cinematic kitchen and flame-searing video section', enabled: false },
+  { id: 'faq-section', name: 'Frequently Asked Questions', description: 'Customer FAQs regarding thermal packaging, express radius, and allergen info', enabled: true },
+  { id: 'testimonials', name: 'Verified Customer Reviews', description: 'Real-time rating overview, verified customer reviews, and direct review submission', enabled: true },
+];
+
 export interface SiteContent {
   heroHeadline1?: string;
   heroHeadline2?: string;
@@ -12,9 +32,30 @@ export interface SiteContent {
   heroSubtitle?: string;
   buttonStyle?: 'pill' | 'rounded' | 'sharp';
   specialOfferText?: string;
-  whatsappPosition?: FloatingButtonCorner;
-  cartPosition?: FloatingButtonCorner;
-  mascotPosition?: FloatingButtonCorner;
+  whatsappPosition?: FloatingButtonCorner | 'hidden';
+  cartPosition?: FloatingButtonCorner | 'hidden';
+  mascotPosition?: FloatingButtonCorner | 'hidden';
+  sections?: SectionConfig[];
+  announcementVisible?: boolean;
+
+  // Granular page layout & alignment options
+  heroLayout?: 'split-right' | 'split-left' | 'centered-stacked' | 'compact-minimal';
+  heroButtonAlign?: 'left' | 'center' | 'right' | 'stretch';
+  heroButtonPlacement?: 'inline' | 'stacked' | 'split-edges';
+  heroShowcasePlacement?: 'right-deck' | 'center-overlap' | 'bottom-stage';
+  
+  dishGridColumns?: 2 | 3 | 4;
+  dishCardStyle?: 'bento' | 'uniform-grid' | 'compact-dense' | 'horizontal-cards';
+  dishButtonPlacement?: 'inline-footer' | 'full-width' | 'floating-overlay';
+  dishTagPlacement?: 'top-left' | 'top-right';
+  dishSortMode?: 'manual' | 'featured-first' | 'price-asc' | 'rating-desc';
+  categoryTabsAlign?: 'center' | 'left' | 'justified';
+  
+  navbarPosition?: 'fixed-top' | 'floating-island' | 'minimal-docked';
+  navbarButtonsAlign?: 'right' | 'split' | 'centered';
+  
+  floatingButtonsStack?: 'vertical' | 'horizontal';
+  floatingButtonsOffset?: 'standard' | 'compact' | 'high';
 }
 
 const DEFAULT_SITE_CONTENT: SiteContent = {
@@ -27,6 +68,25 @@ const DEFAULT_SITE_CONTENT: SiteContent = {
   whatsappPosition: "top-right",
   cartPosition: "top-right",
   mascotPosition: "bottom-right",
+  sections: DEFAULT_SECTIONS,
+  announcementVisible: true,
+
+  heroLayout: 'split-right',
+  heroButtonAlign: 'left',
+  heroButtonPlacement: 'inline',
+  heroShowcasePlacement: 'right-deck',
+  
+  dishGridColumns: 4,
+  dishCardStyle: 'bento',
+  dishButtonPlacement: 'inline-footer',
+  dishTagPlacement: 'top-left',
+  dishSortMode: 'manual',
+  categoryTabsAlign: 'left',
+  
+  navbarPosition: 'floating-island',
+  navbarButtonsAlign: 'right',
+  floatingButtonsStack: 'vertical',
+  floatingButtonsOffset: 'standard',
 };
 
 // Helper to get saved config from localStorage or env

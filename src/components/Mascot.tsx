@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'motion/react';
 import { Flame, X, Send, Sparkles, MessageSquare, ExternalLink, Ticket, Receipt } from 'lucide-react';
 import { sendGroqChatMessage, ChatMessage } from '../lib/groqChat';
@@ -11,6 +11,7 @@ import {
   redeemDeviceDiscount,
   generatePrewrittenOrderMessage,
 } from '../utils/orderInvoice';
+import { trackAnalyticsEvent } from '../utils/analyticsTracker';
 
 const INITIAL_ASSISTANT_MSG: ChatMessage = {
   id: 'init-msg-1',
@@ -44,7 +45,15 @@ export default function Mascot({ siteContent, cart = [] }: MascotProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
+
+  const handleChatWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop += e.deltaY;
+    }
+  };
 
   const floatingPositions = computeFloatingPositions(siteContent);
   const mascotPosInfo = floatingPositions.mascot;
@@ -152,6 +161,7 @@ export default function Mascot({ siteContent, cart = [] }: MascotProps) {
     const newHistory = [...messages, userMsg];
     setMessages(newHistory);
     setInput('');
+    trackAnalyticsEvent('mascot_chat', window.location.pathname || '/');
 
     const lower = text.toLowerCase();
     const isDiscountReq =
@@ -329,6 +339,8 @@ export default function Mascot({ siteContent, cart = [] }: MascotProps) {
         {isChatOpen && (
           <motion.div
             key="mascot-chat-panel"
+            data-lenis-prevent="true"
+            onWheel={handleChatWheel}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -337,10 +349,10 @@ export default function Mascot({ siteContent, cart = [] }: MascotProps) {
               isTopCorner ? 'top-20 sm:top-24' : 'bottom-24 sm:bottom-28'
             } ${
               isLeftCorner ? 'sm:left-8 sm:right-auto' : 'sm:right-8 sm:left-auto'
-            } w-[calc(100vw-24px)] sm:w-96 h-[500px] max-h-[80vh] bg-[var(--theme-surface)] border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] rounded-2xl flex flex-col overflow-hidden pointer-events-auto`}
+            } w-[calc(100vw-24px)] sm:w-96 h-[500px] max-h-[80vh] bg-[var(--theme-surface)] border-3 border-[var(--theme-text)] shadow-[6px_6px_0_0_var(--theme-text)] rounded-2xl flex flex-col overflow-hidden pointer-events-auto overscroll-contain`}
           >
             {/* Panel Header */}
-            <div className="bg-[var(--theme-card-bg)] border-b-2 border-[var(--theme-border)] px-4 py-3 flex items-center justify-between">
+            <div className="bg-[var(--theme-card-bg)] border-b-2 border-[var(--theme-border)] px-4 py-3 flex items-center justify-between select-none">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 bg-amber-500 rounded-full border-2 border-[var(--theme-text)] flex items-center justify-center relative shadow-sm">
                   <Flame className="w-5 h-5 text-amber-900" />
@@ -364,14 +376,19 @@ export default function Mascot({ siteContent, cart = [] }: MascotProps) {
               <button
                 onClick={() => setIsChatOpen(false)}
                 aria-label="Close Assistant Chat"
-                className="p-1.5 text-[var(--theme-text-subtle)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-xl transition-colors border border-transparent hover:border-[var(--theme-border)]"
+                className="p-1.5 text-[var(--theme-text-subtle)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-xl transition-colors border border-transparent hover:border-[var(--theme-border)] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Scrollable Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[var(--theme-surface)]">
+            <div 
+              ref={messagesContainerRef}
+              data-lenis-prevent="true"
+              onWheel={handleChatWheel}
+              className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[var(--theme-surface)] overscroll-contain"
+            >
               {messages.map((msg) => {
                 const isAsst = msg.role === 'assistant';
                 return (

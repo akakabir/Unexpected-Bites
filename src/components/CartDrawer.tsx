@@ -9,6 +9,7 @@ import {
   checkDeviceDiscountStatus,
   redeemDeviceDiscount,
 } from '../utils/orderInvoice';
+import { trackAnalyticsEvent } from '../utils/analyticsTracker';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -55,8 +56,25 @@ export default function CartDrawer({
 
   const handleWhatsAppOrder = () => {
     if (cart.length === 0) return;
-    const message = generatePrewrittenOrderMessage(cart);
-    window.open(`https://wa.me/${BRAND_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    
+    // Log real order telemetry event with actual dishes and grand total
+    cart.forEach((item) => {
+      trackAnalyticsEvent('checkout_click', window.location.pathname || '/', {
+        dishId: item.dish.id,
+        dishName: item.dish.name,
+        category: item.dish.category,
+        price: item.dish.price,
+        quantity: item.quantity,
+        revenue: item.dish.price * item.quantity,
+        metadata: {
+          grandTotal: invoice.grandTotal,
+          itemCount: cart.length,
+          discountApplied: invoice.discountAmount > 0,
+        },
+      });
+    });
+
+    onCheckout();
   };
 
   return (
@@ -74,11 +92,12 @@ export default function CartDrawer({
 
           {/* Drawer Container */}
           <motion.div
+            data-lenis-prevent="true"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-            className="w-full max-w-md h-full bg-[var(--theme-bg)] border-l border-amber-500/30 p-6 flex flex-col justify-between shadow-2xl relative z-10 overflow-y-auto text-[var(--theme-text)]"
+            className="w-full max-w-md h-full bg-[var(--theme-bg)] border-l border-amber-500/30 p-6 flex flex-col justify-between shadow-2xl relative z-10 overflow-y-auto overscroll-contain text-[var(--theme-text)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -104,7 +123,10 @@ export default function CartDrawer({
             </div>
 
             {/* Cart Items List */}
-            <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-3">
+            <div 
+              data-lenis-prevent="true"
+              className="flex-1 overflow-y-auto py-4 flex flex-col gap-3 overscroll-contain"
+            >
               <AnimatePresence>
                 {cart.length > 0 ? (
                   cart.map((item) => (

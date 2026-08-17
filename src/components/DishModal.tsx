@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Dish } from '../types';
 import { X, Star, Clock, Flame, Plus, Minus, Check, ShoppingBag, Sparkles } from 'lucide-react';
+import { trackAnalyticsEvent } from '../utils/analyticsTracker';
 
 interface DishModalProps {
   dish: Dish | null;
@@ -23,6 +24,12 @@ export default function DishModal({ dish, onClose, onAddToCart }: DishModalProps
       setQuantity(1);
       setNotes('');
       setAdded(false);
+      trackAnalyticsEvent('dish_view', window.location.pathname || '/', {
+        dishId: dish.id,
+        dishName: dish.name,
+        category: dish.category,
+        price: dish.price,
+      });
     }
   }, [dish]);
 
@@ -51,11 +58,12 @@ export default function DishModal({ dish, onClose, onAddToCart }: DishModalProps
 
           {/* Modal Container */}
           <motion.div
+            data-lenis-prevent="true"
             initial={{ scale: 0.82, opacity: 0, y: 30 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.88, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 280 }}
-            className="relative w-full max-w-xl glass-panel rounded-3xl overflow-hidden border border-amber-500/40 my-8 shadow-none z-10 bg-[var(--theme-bg)] text-[var(--theme-text)]"
+            className="relative w-full max-w-xl glass-panel rounded-3xl overflow-hidden border border-amber-500/40 my-8 shadow-none z-10 bg-[var(--theme-bg)] text-[var(--theme-text)] overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}

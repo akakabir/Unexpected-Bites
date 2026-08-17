@@ -60,11 +60,12 @@ export default function SubmitReviewModal({
           />
 
           <motion.div
+            data-lenis-prevent="true"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: "spring", damping: 25, stiffness: 280 }}
-            className="relative w-full max-w-lg bg-[var(--theme-surface)] border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 text-[var(--theme-text)]"
+            className="relative w-full max-w-lg bg-[var(--theme-surface)] border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 text-[var(--theme-text)] overscroll-contain"
           >
             <button
               onClick={onClose}

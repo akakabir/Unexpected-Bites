@@ -1,33 +1,16 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import Lenis from 'lenis';
-import { motion, AnimatePresence } from 'motion/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import MarqueeTrustBar from './components/MarqueeTrustBar';
-import MenuSection from './components/MenuSection';
-import HowItWorks from './components/HowItWorks';
-import WhyChooseUs from './components/WhyChooseUs';
-import FoodGallery from './components/FoodGallery';
-import Testimonials from './components/Testimonials';
-import DrawingSvgDivider from './components/DrawingSvgDivider';
-import ScrollVideoSection from './components/ScrollVideoSection';
-import Footer from './components/Footer';
-import Mascot from "./components/Mascot";
-import AmbientBackground from './components/AmbientBackground';
-import NotFoundPage from './components/NotFoundPage';
+import MainWebsiteView from './components/MainWebsiteView';
 import { MENU_DISHES } from './data/kitchenData';
 import { BRAND_CONFIG } from './theme/tokens';
 import { CartItem, Dish, BrandConfig, UserSubmittedReview, PageTab } from './types';
 import { subscribeToDishes, subscribeToSiteContent, SiteContent } from './lib/firebase';
-
-const DishModal = lazy(() => import('./components/DishModal'));
-const CartDrawer = lazy(() => import('./components/CartDrawer'));
-const SubmitReviewModal = lazy(() => import('./components/SubmitReviewModal'));
-const AdminPanel = lazy(() => import('./components/AdminPanel'));
-
 import { generatePrewrittenOrderMessage } from './utils/orderInvoice';
+import { trackAnalyticsEvent, sendSessionHeartbeat } from './utils/analyticsTracker';
+
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
 
 export default function App() {
   // Admin & Page Routing State
@@ -41,6 +24,8 @@ export default function App() {
     if (p === '/admin' || p === '/admin/') return 'home';
     if (p === '/' || p === '') return 'home';
     if (p === '/menu' || p === '/menu/') return 'menu';
+    if (p === '/status' || p === '/status/') return 'status';
+    if (p === '/analytics' || p === '/analytics/') return 'analytics';
     return '404'; // Catch-all 404 for any unmatched route e.g. /hfvber
   });
 
@@ -84,11 +69,22 @@ export default function App() {
       if (!isAdmin) {
         if (p === '/' || p === '') {
           setCurrentPage('home');
+          trackAnalyticsEvent('pageview', '/');
         } else if (p === '/menu' || p === '/menu/') {
           setCurrentPage('menu');
+          trackAnalyticsEvent('pageview', '/menu');
+        } else if (p === '/status' || p === '/status/') {
+          setCurrentPage('status');
+          trackAnalyticsEvent('pageview', '/status');
+        } else if (p === '/analytics' || p === '/analytics/') {
+          setCurrentPage('analytics');
+          trackAnalyticsEvent('pageview', '/analytics');
         } else {
           setCurrentPage('404');
+          trackAnalyticsEvent('pageview', p);
         }
+      } else {
+        trackAnalyticsEvent('pageview', '/admin');
       }
     };
 
@@ -192,11 +188,14 @@ export default function App() {
   // Initialize Lenis Smooth Scrolling
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || isAdminRoute) return;
 
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      prevent: (node) => {
+        return Boolean(node?.hasAttribute?.('data-lenis-prevent') || node?.closest?.('[data-lenis-prevent]'));
+      },
     });
 
     (window as any).lenis = lenis;
@@ -218,6 +217,19 @@ export default function App() {
       lenis.destroy();
       gsap.ticker.remove(raf);
     };
+  }, [isAdminRoute]);
+
+  // Track initial page load and periodic active heartbeat
+  useEffect(() => {
+    const p = window.location.pathname || '/';
+    trackAnalyticsEvent('pageview', p);
+    sendSessionHeartbeat(p);
+
+    const hbInterval = setInterval(() => {
+      sendSessionHeartbeat(window.location.pathname || '/');
+    }, 20000);
+
+    return () => clearInterval(hbInterval);
   }, []);
 
   // Save Cart to LocalStorage
@@ -246,11 +258,33 @@ export default function App() {
     } else if (page === 'menu') {
       setSelectedCategory('all');
     }
+    
+    // Update browser URL smoothly
+    if (page === 'home') {
+      window.history.pushState({}, '', '/');
+      trackAnalyticsEvent('pageview', '/');
+    } else if (page === 'menu') {
+      window.history.pushState({}, '', '/menu');
+      trackAnalyticsEvent('pageview', '/menu');
+    } else if (page === 'status') {
+      window.history.pushState({}, '', '/status');
+      trackAnalyticsEvent('pageview', '/status');
+    } else if (page === 'analytics') {
+      window.history.pushState({}, '', '/analytics');
+      trackAnalyticsEvent('pageview', '/analytics');
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Cart Functions
   const handleAddToCart = (dish: Dish, quantity = 1, notes = '') => {
+    trackAnalyticsEvent('add_to_cart', currentPage === 'menu' ? '/menu' : '/', {
+      dishId: dish.id,
+      dishName: dish.name,
+      metadata: { quantity, price: dish.price },
+    });
+
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex((item) => item.dish.id === dish.id);
       if (existingIndex > -1) {
@@ -283,7 +317,9 @@ export default function App() {
   };
 
   const handleCheckoutFromDrawer = () => {
-    setIsCartOpen(false);
+    trackAnalyticsEvent('checkout_click', currentPage === 'menu' ? '/menu' : '/', {
+      metadata: { itemsCount: cart.length },
+    });
     const message = generatePrewrittenOrderMessage(cart);
     window.open(`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -294,162 +330,44 @@ export default function App() {
 
   if (isAdminRoute) {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center font-serif text-sm">Loading Admin Portal...</div>}>
+      <Suspense fallback={<div className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center font-serif text-sm">Loading Admin Studio...</div>}>
         <AdminPanel
           dishes={dishes}
           siteContent={siteContent}
+          brandConfig={brandConfig}
+          userReviews={userReviews}
+          cart={cart}
           onCloseAdmin={() => {
             window.history.pushState({}, '', '/');
             setIsAdminRoute(false);
           }}
+          onAddToCart={handleAddToCart}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          onClearCart={handleClearCart}
+          onCheckout={handleCheckoutFromDrawer}
+          onAddReview={handleAddReview}
         />
       </Suspense>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--theme-bg)] text-[var(--theme-text)] flex flex-col selection:bg-amber-500 selection:text-stone-950">
-      <AmbientBackground />
-      {/* Floating Pill Navbar */}
-      <Navbar
-        brandConfig={brandConfig}
-        cart={cart}
-        onOpenCart={() => setIsCartOpen(true)}
-        currentPage={currentPage}
-        onSelectPage={handleSelectPage}
-        siteContent={siteContent}
-      />
-
-      {/* Main Multi-Page Content */}
-      <main className="flex-1">
-        <AnimatePresence mode="wait">
-          {currentPage === 'home' && (
-            <motion.div
-              key="home-page"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.35 }}
-            >
-              <Hero
-                dishes={dishes}
-                brandConfig={brandConfig}
-                siteContent={siteContent}
-                onSelectDish={(dish) => setSelectedDishModal(dish)}
-                onAddToCart={(dish) => handleAddToCart(dish, 1)}
-                onOpenReviewModal={() => setIsReviewModalOpen(true)}
-                onNavigateToMenu={() => handleSelectPage('menu')}
-              />
-
-              <MarqueeTrustBar />
-
-              {/* 1. Divider One: Wave */}
-              <DrawingSvgDivider index={1} variant="wave" className="my-10 sm:my-14" />
-
-              <MenuSection
-                dishes={dishes}
-                onSelectDish={(dish) => setSelectedDishModal(dish)}
-                onAddToCart={(dish) => handleAddToCart(dish, 1)}
-                selectedCategory={selectedCategory}
-                highlightsOnly={true}
-                onNavigateToMenu={() => handleSelectPage('menu')}
-              />
-
-              {/* 2. Divider Two: Flow */}
-              <DrawingSvgDivider index={2} variant="flow" className="my-10 sm:my-14" />
-
-              <HowItWorks />
-
-              {/* 3. Divider Three: Curved */}
-              <DrawingSvgDivider index={3} variant="curved" className="my-10 sm:my-14" />
-
-              <WhyChooseUs />
-
-              {/* 4. Divider Four: Zigzag */}
-              <DrawingSvgDivider index={4} variant="zigzag" className="my-10 sm:my-14" />
-
-              <FoodGallery />
-
-              {/* 5. Divider Five: Loop */}
-              <DrawingSvgDivider index={5} variant="loop" className="my-10 sm:my-14" />
-
-              <Testimonials
-                userReviews={userReviews}
-                onOpenReviewModal={() => setIsReviewModalOpen(true)}
-              />
-            </motion.div>
-          )}
-
-          {currentPage === 'menu' && (
-            <motion.div
-              key="menu-page"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.35 }}
-              className="pt-24"
-            >
-              <MenuSection
-                dishes={dishes}
-                onSelectDish={(dish) => setSelectedDishModal(dish)}
-                onAddToCart={(dish) => handleAddToCart(dish, 1)}
-                selectedCategory={selectedCategory}
-              />
-            </motion.div>
-          )}
-
-          {currentPage === '404' && (
-            <motion.div
-              key="404-page"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.35 }}
-            >
-              <NotFoundPage
-                dishes={dishes}
-                onNavigate={handleSelectPage}
-                onSelectDish={(dish) => setSelectedDishModal(dish)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      {/* Footer */}
-      <Footer brandConfig={brandConfig} />
-
-      {/* Modals & Overlays */}
-      <Suspense fallback={null}>
-        {selectedDishModal && (
-          <DishModal
-            dish={selectedDishModal}
-            onClose={() => setSelectedDishModal(null)}
-            onAddToCart={handleAddToCart}
-          />
-        )}
-        
-        {isCartOpen && (
-          <CartDrawer
-            isOpen={isCartOpen}
-            onClose={() => setIsCartOpen(false)}
-            cart={cart}
-            onUpdateQuantity={handleUpdateQuantity}
-            onRemoveItem={handleRemoveItem}
-            onClearCart={handleClearCart}
-            onCheckout={handleCheckoutFromDrawer}
-          />
-        )}
-
-        {isReviewModalOpen && (
-          <SubmitReviewModal
-            isOpen={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
-            onSubmitReview={handleAddReview}
-          />
-        )}
-        <Mascot siteContent={siteContent} cart={cart} />
-      </Suspense>
-    </div>
+    <MainWebsiteView
+      currentPage={currentPage}
+      onSelectPage={handleSelectPage}
+      selectedCategory={selectedCategory}
+      dishes={dishes}
+      siteContent={siteContent}
+      brandConfig={brandConfig}
+      userReviews={userReviews}
+      cart={cart}
+      onAddToCart={handleAddToCart}
+      onUpdateQuantity={handleUpdateQuantity}
+      onRemoveItem={handleRemoveItem}
+      onClearCart={handleClearCart}
+      onCheckout={handleCheckoutFromDrawer}
+      onAddReview={handleAddReview}
+    />
   );
 }

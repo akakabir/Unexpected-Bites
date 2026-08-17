@@ -8,9 +8,15 @@ export interface ButtonPositionInfo {
 }
 
 export function computeFloatingPositions(siteContent?: SiteContent) {
-  const mascotCorner: FloatingButtonCorner = siteContent?.mascotPosition || 'bottom-right';
-  const cartCorner: FloatingButtonCorner = siteContent?.cartPosition || 'top-right';
-  const whatsappCorner: FloatingButtonCorner = siteContent?.whatsappPosition || 'top-right';
+  const mascotCorner = siteContent?.mascotPosition || 'bottom-right';
+  const cartCorner = siteContent?.cartPosition || 'top-right';
+  const whatsappCorner = siteContent?.whatsappPosition || 'top-right';
+  const stackDirection = siteContent?.floatingButtonsStack || 'vertical';
+  const offsetPreset = siteContent?.floatingButtonsOffset || 'standard';
+
+  const baseOffset = offsetPreset === 'compact' ? 12 : offsetPreset === 'high' ? 44 : 24;
+  const topBaseOffset = offsetPreset === 'compact' ? 72 : offsetPreset === 'high' ? 104 : 88;
+  const gap = stackDirection === 'horizontal' ? 68 : 72;
 
   const corners: Record<FloatingButtonCorner, string[]> = {
     'bottom-right': [],
@@ -19,20 +25,22 @@ export function computeFloatingPositions(siteContent?: SiteContent) {
     'top-right': [],
   };
 
-  corners[mascotCorner].push('mascot');
-  
-  if (cartCorner !== 'top-right') {
-    corners[cartCorner].push('cart');
+  if (mascotCorner !== 'hidden' && corners[mascotCorner as FloatingButtonCorner]) {
+    corners[mascotCorner as FloatingButtonCorner].push('mascot');
   }
   
-  if (whatsappCorner !== 'top-right') {
-    corners[whatsappCorner].push('whatsapp');
+  if (cartCorner !== 'top-right' && cartCorner !== 'hidden' && corners[cartCorner as FloatingButtonCorner]) {
+    corners[cartCorner as FloatingButtonCorner].push('cart');
+  }
+  
+  if (whatsappCorner !== 'top-right' && whatsappCorner !== 'hidden' && corners[whatsappCorner as FloatingButtonCorner]) {
+    corners[whatsappCorner as FloatingButtonCorner].push('whatsapp');
   }
 
   const result: Record<string, ButtonPositionInfo> = {
-    mascot: { corner: mascotCorner, style: {}, isFloating: true },
-    cart: { corner: cartCorner, style: {}, isFloating: cartCorner !== 'top-right' },
-    whatsapp: { corner: whatsappCorner, style: {}, isFloating: whatsappCorner !== 'top-right' },
+    mascot: { corner: mascotCorner as FloatingButtonCorner, style: mascotCorner === 'hidden' ? { display: 'none' } : {}, isFloating: mascotCorner !== 'hidden' },
+    cart: { corner: cartCorner as FloatingButtonCorner, style: cartCorner === 'hidden' ? { display: 'none' } : {}, isFloating: cartCorner !== 'top-right' && cartCorner !== 'hidden' },
+    whatsapp: { corner: whatsappCorner as FloatingButtonCorner, style: whatsappCorner === 'hidden' ? { display: 'none' } : {}, isFloating: whatsappCorner !== 'top-right' && whatsappCorner !== 'hidden' },
   };
 
   (Object.keys(corners) as FloatingButtonCorner[]).forEach((corner) => {
@@ -40,14 +48,27 @@ export function computeFloatingPositions(siteContent?: SiteContent) {
     list.forEach((btnKey, idx) => {
       let style: CSSProperties = { position: 'fixed', zIndex: 70 };
       
-      if (corner === 'bottom-right') {
-        style = { ...style, bottom: `${24 + idx * 72}px`, right: '24px' };
-      } else if (corner === 'bottom-left') {
-        style = { ...style, bottom: `${24 + idx * 72}px`, left: '24px' };
-      } else if (corner === 'top-left') {
-        style = { ...style, top: `${88 + idx * 64}px`, left: '24px' };
-      } else if (corner === 'top-right') {
-        style = { ...style, top: `${88 + idx * 64}px`, right: '24px' };
+      if (stackDirection === 'horizontal') {
+        if (corner === 'bottom-right') {
+          style = { ...style, bottom: `${baseOffset}px`, right: `${baseOffset + idx * gap}px` };
+        } else if (corner === 'bottom-left') {
+          style = { ...style, bottom: `${baseOffset}px`, left: `${baseOffset + idx * gap}px` };
+        } else if (corner === 'top-left') {
+          style = { ...style, top: `${topBaseOffset}px`, left: `${baseOffset + idx * gap}px` };
+        } else if (corner === 'top-right') {
+          style = { ...style, top: `${topBaseOffset}px`, right: `${baseOffset + idx * gap}px` };
+        }
+      } else {
+        // Vertical stack
+        if (corner === 'bottom-right') {
+          style = { ...style, bottom: `${baseOffset + idx * gap}px`, right: `${baseOffset}px` };
+        } else if (corner === 'bottom-left') {
+          style = { ...style, bottom: `${baseOffset + idx * gap}px`, left: `${baseOffset}px` };
+        } else if (corner === 'top-left') {
+          style = { ...style, top: `${topBaseOffset + idx * (gap - 8)}px`, left: `${baseOffset}px` };
+        } else if (corner === 'top-right') {
+          style = { ...style, top: `${topBaseOffset + idx * (gap - 8)}px`, right: `${baseOffset}px` };
+        }
       }
       
       result[btnKey] = {

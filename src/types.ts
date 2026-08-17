@@ -1,4 +1,4 @@
-export type PageTab = 'home' | 'menu' | '404';
+export type PageTab = 'home' | 'menu' | 'status' | 'analytics' | '404';
 
 export interface VideoReel {
   id: string;

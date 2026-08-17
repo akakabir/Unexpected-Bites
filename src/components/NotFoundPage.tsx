@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Flame, Utensils, Home, Search, ArrowRight, Compass, Sparkles } from 'lucide-react';
+import { Flame, Utensils, Home, Search, ArrowRight, Compass, Sparkles, Activity } from 'lucide-react';
 import { Dish, PageTab } from '../types';
 
 interface NotFoundPageProps {
@@ -95,6 +95,22 @@ export default function NotFoundPage({ dishes, onNavigate, onSelectDish }: NotFo
             <Utensils className="w-4 h-4 text-amber-500" />
             <span>Explore Menu</span>
             <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={() => onNavigate('status')}
+            className="min-h-[44px] px-6 py-3 rounded-2xl bg-[var(--theme-surface)] hover:bg-[var(--theme-surface-hover)] text-[var(--theme-text)] font-serif font-black text-sm flex items-center gap-2 border-2 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] hover:translate-y-[-2px] active:translate-y-[0px] transition-all cursor-pointer"
+          >
+            <Activity className="w-4 h-4 text-emerald-400" />
+            <span>System Status</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate('analytics')}
+            className="min-h-[44px] px-6 py-3 rounded-2xl bg-[var(--theme-surface)] hover:bg-[var(--theme-surface-hover)] text-[var(--theme-text)] font-serif font-black text-sm flex items-center gap-2 border-2 border-[var(--theme-text)] shadow-[4px_4px_0_0_var(--theme-text)] hover:translate-y-[-2px] active:translate-y-[0px] transition-all cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span>Analytics</span>
           </button>
         </div>
 

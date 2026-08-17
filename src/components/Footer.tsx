@@ -40,6 +40,13 @@ export default function Footer({ brandConfig }: FooterProps) {
           <h4 className="font-serif font-bold text-[var(--theme-text)] text-sm">Navigation</h4>
           <a href="#home" className="hover:text-amber-400 transition-colors">Home</a>
           <a href="#menu" className="hover:text-amber-400 transition-colors">Gourmet Menu</a>
+          <a href="/status" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            System Status
+          </a>
+          <a href="/analytics" className="hover:text-amber-400 transition-colors">
+            Analytics
+          </a>
           <a
             href={`https://wa.me/${brandConfig.whatsappNumber}?text=${encodeURIComponent('Hi! I would like to place an order.')}`}
             target="_blank"

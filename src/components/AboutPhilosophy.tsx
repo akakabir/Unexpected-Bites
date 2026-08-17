@@ -41,31 +41,31 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
         >
           <div className="inline-flex items-center gap-2 text-amber-600 text-xs font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full w-fit">
             <Sparkles className="w-4 h-4" />
-            <span>OUR CULINARY WOK PHILOSOPHY</span>
+            <span>OUR CULINARY CRAFT & PHILOSOPHY</span>
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--theme-text)] leading-tight">
             Redefining Gourmet <br />
             <span className="text-amber-600 font-extrabold">
-              Asian Cloud Dining
+              Craft Burgers & Desserts
             </span>
           </h2>
 
           <p className="text-[var(--theme-text-muted)] text-base leading-relaxed">
-            Founded with a commitment to authentic wok hei, <span className="text-amber-700 font-bold">{brandConfig.name}</span> bridges the gap between high-end restaurant wok techniques and hyper-fast delivery. We believe food delivered to your home should never sacrifice heat, texture, or nutritional integrity.
+            Founded with an obsession for culinary excellence, <span className="text-amber-700 font-bold">{brandConfig.name}</span> bridges the gap between high-end chef creations and hyper-fast home delivery. We believe food delivered to your door should never compromise on crunch, heat, or texture.
           </p>
 
           <p className="text-[var(--theme-text-subtle)] text-sm leading-relaxed">
-            Our state-of-the-art kitchen features commercial high-flame wok stations, charcoal tandoor hearths, and precision saucier stations operated with surgical hygiene and farm-fresh daily sourcing.
+            Our state-of-the-art kitchen features custom high-heat smash planchas, precision buttermilk fry stations, and warm bakery proofing ovens operated with strict hygiene standards and farm-fresh daily sourcing.
           </p>
 
           {/* Key Checklist */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             {[
-              "5 AM Daily Organic Farm Produce",
-              "Non-GMO Cold Pressed Oils",
+              "100% Certified Prime Angus & Fresh Chicken",
+              "Artisan Brioche Baked Daily",
               "Double Tamper-Evident Thermal Seal",
-              "100% Sizzle & Satisfaction Pledge"
+              "Freshness & 65°C Temperature Guarantee"
             ].map((item, idx) => (
               <motion.div
                 key={idx}
@@ -92,12 +92,12 @@ export default function AboutPhilosophy({ brandConfig }: AboutPhilosophyProps) {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold text-[var(--theme-text)] font-serif flex items-center gap-1.5">
-                <span>Master Wok Culinary Collective</span>
+                <span>Executive Culinary Collective</span>
                 <Award className="w-3.5 h-3.5 text-amber-600" />
               </span>
-              <span className="text-[11px] text-amber-700 font-bold">Artisanal Flame Technique</span>
+              <span className="text-[11px] text-amber-700 font-bold">Artisanal Flame & Sizzle Craft</span>
               <p className="text-[11px] text-[var(--theme-text-muted)] italic mt-0.5">
-                "Every wok dish is tossed to order with high-flame wok hei — intense sizzle, vibrant garden crunch, and thermal retention excellence."
+                "Every single burger is smashed to order for lacy caramelized crusts, paired with fresh brioche and thermal retention delivery excellence."
               </p>
             </div>
           </motion.div>
